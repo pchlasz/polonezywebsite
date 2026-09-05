@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }   
+            /* Styl paska Marquee na dole */
+            .retro-marquee-bar {
+                background-color: #000080;
+                border-top: 3px outset #fff;
+                border-bottom: 3px outset #fff;
+                color: #FFFF00;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                padding: 4px 0;
+            }
+            .auto-box {
+                background: rgba(255, 255, 255, 0.9);
+                margin: 30px auto;
+                padding: 20px;
+                width: 65%;
+                border: 4px ridge #ccc;
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+                animation: fadeIn 0.4s ease-in-out;
+            }
+            h2 img {
+                height: 35px;
+                vertical-align: middle;
+                margin-right: 10px;
+            }
+            
+            #okienko-zdjecie {
+                display: none; 
+                position: fixed;
+                z-index: 99999; 
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.8); 
+            }
+
+            .okienko-zawartosc {
+                max-width: 80%;
+                max-height: 80%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                border: 5px ridge #ccc; 
+                box-shadow: 0px 0px 20px black;
+            }
+
+            .zamknij-okienko {
+                position: absolute;
+                top: 20px;
+                right: 40px;
+                color: white;
+                font-size: 50px;
+                font-weight: bold;
+                cursor: pointer;
+                font-family: Arial, sans-serif;
+            }
+
+            .zamknij-okienko:hover {
+                color: red; 
+            }
+
+            body {
+                background-image: url("a.jpg");
+                background-size: cover;          
+                background-repeat: no-repeat;    
+                background-position: center;     
+                background-attachment: fixed;    
+                margin: 0;                       
+                font-family: "Courier New", Courier, monospace;
+                padding-top: 60px;               
+                padding-bottom: 80px;            
+            }
+            h1, h2 { text-align: center; color: darkblue; }
+            p { text-align: center; }
+            div { text-align: center; }
+            
+            table {
+                margin: 15px auto;
+                background: #fff;
+                border-collapse: collapse;
+                width: 85%;
+            }
+            th, td {
+                border: 2px solid #000;
+                padding: 8px;
+                text-align: center;
+                color: black;
+                font-size: 13px;
+            }
+            th { background-color: #ccc; font-weight: bold; }
+
+            .gorne-menu {
+                position: fixed;                 
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: #dbdbdb;       
+                border-bottom: 3px outset #fff;  
+                z-index: 9999;                   
+                box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+            }
+            
+            .gorne-menu ul {
+                display: flex;                   
+                justify-content: center;         
+                align-items: center;
+                list-style-type: none;           
+                margin: 0;
+                padding: 10px 0;
+            }
+            
+            .gorne-menu li {
+                margin: 0 10px;                  
+                display: flex;
+                align-items: center;
+            }
+            
+            .gorne-menu a {
+                color: #0000FF;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 4px 8px;
+                border: 1px solid transparent; 
+            }
+            
+            .gorne-menu a:hover {
+                background-color: #000080;       
+                color: #FFFF00;                  
+                border: 1px outset #fff;         
+                border-radius: 0px;              
+            }
+            
+            .panel-sortowania {
+                background: rgba(255, 255, 255, 0.95);
+                border: 3px ridge #ccc;
+                padding: 10px;
+                width: 65%;
+                margin: 20px auto 10px auto;
+                text-align: right;
+                font-weight: bold;
+                position: relative;
+            }
+
+            .prl-cytat-box {
+                background: rgba(255, 255, 240, 0.95);
+                border: 3px ridge #b5b5b5;
+                padding: 12px 20px;
+                width: 65%;
+                margin: 0 auto 20px auto;
+                text-align: center;
+                font-family: "Courier New", Courier, monospace;
+                box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+            }
+            .prl-cytat-tytul {
+                font-size: 11px;
+                font-weight: bold;
+                color: #8b0000;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .prl-cytat-tekst {
+                font-size: 13px;
+                color: #000;
+                font-style: italic;
+                margin-bottom: 8px;
+            }
+            .btn-losuj {
+                background: #ccc;
+                border: 2px outset #fff;
+                font-family: Tahoma, sans-serif;
+                font-size: 10px;
+                font-weight: bold;
+                padding: 2px 8px;
+                cursor: pointer;
+            }
+            .btn-losuj:active {
+                border-style: inset;
+                background: #b5b5b5;
+            }
+
+            .custom-select-wrapper {
+                position: relative;
+                display: inline-block;
+                text-align: left;
+                width: 350px;
+                font-family: "Courier New", Courier, monospace;
+            }
+
+            .custom-select-trigger {
+                background: #ffffe0;
+                border: 2px solid #000;
+                padding: 6px 10px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                font-weight: bold;
+                font-size: 13px;
+            }
+
+            .custom-select-trigger img {
+                height: 20px;
+                vertical-align: middle;
+                margin-right: 8px;
+            }
+
+            .custom-options {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #fff;
+                border: 2px solid #000;
+                border-top: none;
+                display: none;
+                z-index: 999;
+                box-shadow: 0px 4px 6px rgba(0,0,0,0.3);
+            }
+
+            .custom-select-wrapper.open .custom-options {
+                display: block;
+            }
+
+            .custom-option {
+                padding: 8px 10px;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                font-size: 13px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .custom-option:hover {
+                background-color: #000080;
+                color: white;
+            }
+
+            .custom-option img {
+                height: 20px;
+                margin-right: 8px;
+            }
+
+            .bottom-fixed-area {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                z-index: 9999;
+                background-color: #008080;
+            }
+
+            .footer-content {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                background-color: #c0c0c0;
+                border-top: 2px outset #fff;
+                padding: 4px 10px;
+                font-size: 10px;
+                font-family: Tahoma, sans-serif;
+            }
+
+            .netscape-badge {
+                border: 2px outset #fff;
+                background: #000;
+                color: #0f0;
+                padding: 2px 6px;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                cursor: pointer;
+                text-align: center;
+            }
+
+            .netscape-badge:active {
+                border: 2px inset #fff;
+            }
+
+            .btn-gora {
+                position: fixed;
+                right: 20px;
+                bottom: 235px;
+                background: #ccc;
+                border: 3px outset #fff;
+                padding: 6px 10px;
+                font-family: Tahoma, sans-serif;
+                font-size: 11px;
+                font-weight: bold;
+                cursor: pointer;
+                z-index: 9999;
+                text-decoration: none;
+                color: black;
+                box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            }
+            .btn-gora:active {
+                border-style: inset;
+                background: #b5b5b5;
+            }
+
+            .hit-counter {
+                background: #000;
+                color: #0f0;
+                font-family: "Courier New", monospace;
+                font-size: 11px;
+                padding: 2px 6px;
+                border: 2px inset #fff;
+                letter-spacing: 2px;
+                display: inline-block;
+                margin-left: 8px;
+            }
+        </style>
+        <title>Pchlasz - Garaz PRL</title>
+        <link rel="shortcut icon" href="yourfile.gif" type="image/x-icon">
+    </head>
+    <body>
+
+        <audio id="dzwiek-polonez" src="polonez_klakson.mp3" preload="auto"></audio>
+        <audio id="dzwiek-fiat" src="maluch_odpala.mp3" preload="auto"></audio>
+        <audio id="dzwiek-dwusuw" src="syrena_dwusuw.mp3" preload="auto"></audio>
+        <audio id="dzwiek-dostawczy" src="zuk_nysa.mp3" preload="auto"></audio>
+        
+        <audio id="sound-click" src="click.mp3" preload="auto"></audio>
+        <audio id="sound-menu" src="menu.mp3" preload="auto"></audio>
+        <audio id="sound-error" src="error.mp3" preload="auto"></audio>
+
+        <!-- POZIOME MENU RETRO Z EFEKTEM PISANIA -->
+        <nav class="gorne-menu">
+            <ul>
+                <li style="margin-left: 20px; margin-right: 15px;">
+                    <img src="logo_paska.png" height="25" alt="Logo" style="vertical-align: middle;">
+                </li>
+
+                <li style="margin-right: auto; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: red; font-weight: bold; white-space: nowrap;" id="efekt-tekst">
+                    <!-- Tekst pisze się sam -->
+                </li>
+
+                <li style="margin-right: 10px; font-family: Tahoma; font-size: 13px; color: black;"><b>NAWIGACJA:</b></li>
+                <li><a href="strona testpwa.html" onclick="odtwarzDzwiekMenu()"><img src="1.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Główna</a></li>
+                <li><a href="odnosnik.html" onclick="odtwarzDzwiekMenu()"><img src="2.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Dodatkowa</a></li>
+                <li><a href="strona2.html" onclick="odtwarzDzwiekMenu()"><img src="3.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Księga Gości</a></li>
+                <li><a href="auta.html" onclick="odtwarzDzwiekMenu()"><img src="4.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Kultowe Auta PRL</a></li>
+                <li><a href="osoby.html" onclick="odtwarzDzwiekMenu()"><img src="5.gif" height="18" style="vertical-align: middle; margin-right: 4px;">(Ważne Osoby PRL)</a></li>
+                <li><a href="radio.html" onclick="odtwarzDzwiekMenu()"><img src="6.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Radio PRL</a></li>
+                <li><a href="alkohole.html" onclick="odtwarzDzwiekMenu()"><img src="7.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Alkohole PRL</a></li>
+            </ul>
+        </nav>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <img src="garazlogo.gif" alt="Garaz Kultowych Aut PRL">
+        </div>
+
+        <div class="panel-sortowania">
+            <span style="font-size: 13px; margin-right: 10px;">Filtruj Samochody po producencie:</span>
+            <div class="custom-select-wrapper" id="customSelect">
+                <div class="custom-select-trigger" onclick="odtwarzDzwiekKlikniecia(); toggleDropdown()">
+                    <span id="selected-label">-- Pokaż wszystkie auta --</span>
+                    <span>▼</span>
+                </div>
+                <div class="custom-options">
+                    <div class="custom-option" onclick="odtwarzDzwiekKlikniecia(); wybierzOpcje('wszystkie', '-- Pokaż wszystkie auta --', '')">
+                        -- Pokaż wszystkie auta --
+                    </div>
+                    <div class="custom-option" onclick="odtwarzDzwiekKlikniecia(); wybierzOpcje('fso', 'FSO (Warszawa, Syrena, Polonez)', 'logofso.png')">
+                        <img src="logofso.png" alt="FSO"> FSO (Warszawa, Syrena, Polonez)
+                    </div>
+                    <div class="custom-option" onclick="odtwarzDzwiekKlikniecia(); wybierzOpcje('fiat', 'Fiat / Polski Fiat (125p, 126p)', 'fiut.png')">
+                        <img src="fiut.png" alt="Fiat"> Fiat / Polski Fiat (125p, 126p)
+                    </div>
+                    <div class="custom-option" onclick="odtwarzDzwiekKlikniecia(); wybierzOpcje('fsd', 'FSD / Dostawcze (Nysa, Żuk, Tarpan)', 'logofsd.png')">
+                        <img src="logofsd.png" alt="FSD"> FSD / Dostawcze (Nysa, Żuk, Tarpan)
+                    </div>
+                    <div class="custom-option" onclick="odtwarzDzwiekKlikniecia(); wybierzOpcje('prototyp', 'Prototyp / Unikat (Syrena Sport)', 'logofso.png')">
+                        <img src="logofso.png" alt="Prototyp"> Prototyp / Unikat (Syrena Sport)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prl-cytat-box">
+            <div class="prl-cytat-tytul">★ KULTOWA MYŚL PRL-U DNIA ★</div>
+            <div id="cytat-tresc" class="prl-cytat-tekst">"Ładowanie mądrości narodowych..."</div>
+            <button class="btn-losuj" onclick="odtwarzDzwiekKlikniecia(); wylosujCytat()">🎲 Wylosuj inną złotą myśl</button>
+        </div>
+
+        <a href="#" class="btn-gora" onclick="odtwarzDzwiekKlikniecia()">^ Góra</a>
+
+        <div style="position: fixed; right: 20px; bottom: 95px; z-index: 9999; text-align: center;">
+            <div style="background: #ccc; border: 3px outset #fff; padding: 8px 12px; text-align: center; width: 240px; box-shadow: 4px 4px 10px rgba(0,0,0,0.5);">
+                <div style="background-color: #000080; color: white; font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; margin-bottom: 6px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Radio.exe</span>
+                    <span style="cursor:pointer;" onclick="odtwarzDzwiekBledu()">[X]</span>
+                </div>
+                
+                <div id="song-title" style="background: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 10px; padding: 4px; margin-bottom: 6px; border: 2px inset #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    Ładowanie...
+                </div>
+
+                <audio id="bg-music" style="display: none;"></audio>
+                
+                <div style="margin-bottom: 6px;">
+                    <button onclick="odtwarzDzwiekKlikniecia(); poprzedniaPiosenka()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; border: 2px outset #fff; background: #ccc; cursor: pointer;">&lt;&lt;</button>
+                    <button id="play-pause-btn" onclick="odtwarzDzwiekKlikniecia(); przelaczOdtwarzanie()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 8px; border: 2px outset #fff; background: #ccc; cursor: pointer;">Start</button>
+                    <button onclick="odtwarzDzwiekKlikniecia(); nastepnaPiosenka()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; border: 2px outset #fff; background: #ccc; cursor: pointer;">&gt;&gt;</button>
+                </div>
+
+                <div>
+                    <button id="mute-btn" onclick="odtwarzDzwiekKlikniecia(); przelaczWyciszenie()" style="font-family: Tahoma; font-size: 9px; font-weight: bold; padding: 2px 6px; border: 2px outset #fff; background: #ccc; cursor: pointer;">🔊 Dźwięk: Wł.</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SEKCJE WSZYSTKICH AUT -->
+        <div class="auto-box" data-producent="fso">
+            <h2 style="margin-bottom: 5px;"><img src="logofso.png" height="35" style="vertical-align: middle;">Polonez 1.5 ("Borewicz")</h2>
+            <div style="text-align: center; margin: 5px 0 15px 0;">
+                <img src="foto_polonez15.jpeg" alt="Zdjecie Poloneza 1.5" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'polonez')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Prawdziwa legenda i gwiazda serialu "07 zgłoś się". To za kółkiem tego wozu porucznik Borewicz ścigał cinkciarzy i prywaciarzy. Włoska linia nadwozia projektu samego Giugiaro, pod którą ukryto bebechy z Dużego Fiata. Kanciasty przód robił respekt na dzielnicy, a kręcenie kierownicą na parkingu skutecznie zastępowało wizytę na siłowni.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1978 – 1991</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.5 (CB / C / LE / SLE) - gaźnikowe</td></tr>
+                <tr><td>Cena kiedyś</td><td>Majątek i talon (lata 80. ok. 150-200 tys. zł lub 3300 USD)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 15 000 – 35 000 zł</td></tr>
+                <tr><td>Dostępne kolory</td><td>Kość słoniowa, beż, jasna zieleń, pomarańcz, milicyjny niebieski</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 17-19 sekund</td></tr>
+            </table>
+        </div>
+        
+        <div class="auto-box" data-producent="fso">
+            <h2 style="margin-bottom: 5px;"><img src="logofso.png" height="35" style="vertical-align: middle;">Polonez 1.6</h2>
+            <div style="text-align: center; margin: 5px 0 15px 0;">
+                <img src="foto_polonez16.jpeg" alt="Zdjecie Poloneza 1.6" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'polonez')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Naturalna ewolucja polskiej motoryzacji. Silnik o pojemności 1.6 dawał wreszcie poczucie, że auto potrafi przyspieszać, a nie tylko nabierać prędkości. Aerodynamika kioskowej budki pozostała niezmienna, ale za to w środku było na tyle miejsca, że po złożeniu siedzeń można było przewieźć pół meblościanki albo lodówkę Mińsk. Prawdziwy wół roboczy lat 90.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1987 – 1997</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.6 SLE / GLI (gaźnik lub jednopunktowy wtrysk)</td></tr>
+                <tr><td>Cena kiedyś</td><td>3500 - 4500 USD (w latach transformacji)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 8 000 – 20 000 zł</td></tr>
+                <tr><td>Dostępne kolory</td><td>Biały, czerwony, grafitowy metalik, zielony</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 16 sekund</td></tr>
+            </table>
+        </div>
+        
+        <div class="auto-box" data-producent="fso">
+            <h2><img src="logofso.png" height="35" style="vertical-align: middle;">Polonez Caro ( Moje <img src="ohv.webp" height="35" style="vertical-align: middle; margin-right: -10px;"> )</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_polonez.jpg" alt="Zdjecie Poloneza" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'polonez')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Legendarny polski samochod, ktory byl hitem na osiedlach. Wersja Caro przyniosla nowoczesne, plastikowe zderzaki. Kultowy silnik OHV wydaje charakterystyczne dzwieki, a zimą jazda bez dociazenia bagaznika to powazne wyzwanie. Wlacz to, bo chce miodu!
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1991 – 1997</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.5 OHV, 1.6 OHV, brytyjski 1.4 MPI (Rover) oraz 1.9 Diesel (PSA)</td></tr>
+                <tr><td>Cena kiedyś</td><td>ok. 120-150 mln zł przed denominacją</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 6 000 – 18 000 zł</td></tr>
+                <tr><td>Dostępne kolory</td><td>Czerwony wiśniowy, biały, granatowy, turkusowy metalik</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Od 14 sekund do 18 sekund</td></tr>
+            </table>
+        </div>
+        
+        <div class="auto-box" data-producent="fso">
+            <h2 style="margin-bottom: 5px;"><img src="logofso.png" height="35" style="vertical-align: middle;">Polonez Caro Plus</h2>
+            <div style="text-align: center; margin: 5px 0 15px 0;">
+                <img src="foto_caroplus.jpeg" alt="Zdjecie Poloneza Caro Plus" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'polonez')">
+            </div>   
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Ostatnie tchnienie fabryki na Żeraniu, już pod czujnym okiem koreańskiego Daewoo. Caro Plus to powiew zachodniego luksusu – dostał nową, zaokrągloną deskę rozdzielczą, klamki, które przestały urywać paznokcie, i wielopunktowy wtrysk paliwa.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1997 – 2002</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Daewoo-FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.6 GLI, 1.6 GSI (16V) oraz 1.4 MPI Rover</td></tr>
+                <tr><td>Cena kiedyś</td><td>ok. 25 000 - 35 000 PLN (w salonach)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 7 000 – 22 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 13.5 - 15 sekund</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fso">
+            <h2 style="margin-bottom: 5px;"><img src="logofso.png" height="35" style="vertical-align: middle;">Polonez Atu</h2>
+            <div style="text-align: center; margin: 5px 0 15px 0;">
+                <img src="foto_atu.webp" alt="Zdjecie Poloneza Atu" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'polonez')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Odpowiedź FSO na rynkowe zapotrzebowanie na sedana, czyli kultowy Polonez z "plecakiem". Wersja Atu zadebiutowała w połowie lat 90., dając polskim rodzinom i biznesmenom złudzenie posiadania bardziej eleganckiej limuzyny.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1996 – 1997</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.6 GLI, 1.4 MPI Rover</td></tr>
+                <tr><td>Cena kiedyś</td><td>ok. 30 000 PLN</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 5 000 – 15 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 14 sekund</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fso">
+            <h2 style="margin-bottom: 5px;"><img src="logofso.png" height="35" style="vertical-align: middle;">Polonez Atu Plus</h2>
+            <div style="text-align: center; margin: 5px 0 15px 0;">
+                <img src="foto_atuplus.jpeg" alt="Zdjecie Poloneza Atu Plus" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'polonez')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Zmodernizowana odmiana sedana z epoki Daewoo-FSO. Atu Plus zyskał to samo co Caro Plus – nowocześniejszy przód, lepsze wyciszenie kabiny oraz bardziej cywilizowaną deskę rozdzielczą.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1997 – 2002</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Daewoo-FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.6 GSI, 1.4 MPI Rover</td></tr>
+                <tr><td>Cena kiedyś</td><td>ok. 32 000 - 38 000 PLN</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 6 000 – 18 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 13.5 - 15 sekund</td></tr>
+            </table>
+        </div>
+        
+        <div class="auto-box" data-producent="fso">
+            <h2><img src="logofso.png" height="35" style="vertical-align: middle;">Warszawa</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_warszawa.jpeg" alt="Zdjecie Warszawy" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'dwusuw')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Pierwszy seryjnie produkowany samochod w powojennej Polsce. Blacha byla tak gruba, ze auto wazylo niemal poltorej tony. Sluzyla glownie jako taksowka, milicyjny woz oraz limuzyna dla urzednikow.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1951 – 1973</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>M-20 (dolnozaworowy), S-21 (górnozaworowy 2.1 l)</td></tr>
+                <tr><td>Cena kiedyś</td><td>Towar reglamentowany / talony (w latach 60. ok. 120 000 zł)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 40 000 – 90 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 30-40 sekund (czołgowe tempo)</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fso">
+            <h2><img src="logofso.png" height="35" style="vertical-align: middle;">Syrena 105 ("Kurołapka")</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_syrena105.jpg" alt="Zdjecie Syreny" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'dwusuw')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Królowa polskich dróg i dwusuwowy generator chmur niebieskiego dymu z oleju Mixol. Biegi przy kierownicy to czysta poezja. Rdza zjadała ją już w prospekcie reklamowym.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1972 – 1983 (w FSO, później w WSM Bielsko-Biała)</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO Warszawa / WSM Bielsko-Biała</td></tr>
+                <tr><td>Wersje silnikowe</td><td>S-31 (3-cylindrowy dwusuw, poj. 843 cm³)</td></tr>
+                <tr><td>Cena kiedyś</td><td>72 000 zł (według oficjalnych cenników z lat 70.)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 15 000 – 40 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 40 sekund (o ile wiatr wieja w plecy)</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="prototyp">
+            <h2><img src="logofso.png" height="35" style="vertical-align: middle;">Syrena Sport (Prototyp)</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_syrenasport.png" alt="Zdjecie Syreny Sport" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'dwusuw')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Najpiękniejszy polski samochód, którego komunistyczna władza kazała zniszczyć. Zbudowany potajemnie przez inżynierów z FSO jako wizja nowoczesnego auta sportowego z laminatowym nadwoziem.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1960 (jedyny egzemplarz prototypowy)</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Ośrodek Badawczo-Rozwojowy FSO, Warszawa</td></tr>
+                <tr><td>Wersje silnikowe</td><td>Dwucylindrowy bokser, czterosuwowy, poj. 700 cm³</td></tr>
+                <tr><td>Cena kiedyś</td><td>Prototyp (nie do kupienia za żadne pieniądze)</td></tr>
+                <tr><td>Cena teraz</td><td>Repliki budowane przez pasjonatów to koszt rzędu 150 000+ zł</td></tr>
+                <tr><td>Prędkość maksymalna</td><td>Ok. 110-120 km/h</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fiat">
+            <h2><img src="fiut.png" height="35" style="vertical-align: middle;">125p (Duży Fiat)</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_125p.jpg" alt="Zdjecie Fiata 125p" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'fiat')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Popularny "Kredens" lub "Kant", czyli marzenie każdego ojca w PRL-u. Kanciasty, majestatyczny i znacznie bardziej prestiżowy od Malucha. To nim jeździli legendarni "Zmiennicy".
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1967 – 1991</td></tr>
+                <tr><td>Miejsce produkcji</td><td>FSO, Żerań (Warszawa)</td></tr>
+                <tr><td>Wersje silnikowe</td><td>1.3 (125B) oraz 1.5 (1300/1500), sporadycznie diesle</td></tr>
+                <tr><td>Cena kiedyś</td><td>Eksport wewnętrzny (bony PKO) lub wieloletni talon (ok. 75-100 tys. zł w latach 70.)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 12 000 – 35 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 17-20 sekund</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fiat">
+            <h2><img src="fiut.png" height="35" style="vertical-align: middle;">126p (Maluch)</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="zdjecie_126p.jpeg" alt="Zdjecie Fiata 126p" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'fiat')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Samochód, który zmotoryzował Polskę. Mimo że do bagażnika z przodu mieściła się tylko kosmetyczka, czteroosobowa rodzina potrafiła dojechać nim do Bułgarii.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1973 – 2000</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Fabryka Samochodów Małolitrażowych (FSM), Tychy / Bielsko-Biała</td></tr>
+                <tr><td>Wersje silnikowe</td><td>600 cm³, 650 cm³ oraz chłodzony cieczą 704 cm³ (Bis)</td></tr>
+                <tr><td>Cena kiedyś</td><td>69 000 zł (na początku produkcji w latach 70.)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 8 000 – 30 000 zł</td></tr>
+                <tr><td>Przyspieszenie 0-100 km/h</td><td>Około 33-35 sekund (prawdziwa szkoła cierpliwości)</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fsd">
+            <h2><img src="logofsc.jpg" height="35" style="vertical-align: middle;">FSC Żuk</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_zuk.jpeg" alt="Zdjecie Żuka" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'dostawczy')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Legendarny polski samochód dostawczy produkowany w Lublinie. Kanciasta, użytkowa sylwetka i niezawodny charakter. Żuk przewiózł miliony ton towarów.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1958 – 1998</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Fabryka Samochodów Ciężarowych (FSC), Lublin</td></tr>
+                <tr><td>Wersje silnikowe</td><td>M-20, S-21 (benzynowe 2.1 l), oraz diesel Andoria 4C90</td></tr>
+                <tr><td>Cena kiedyś</td><td>Przeznaczony głównie dla państwowych przedsiębiorstw i PGR-ów (na przydział)</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 6 000 – 20 000 zł</td></tr>
+                <tr><td>Ładowność</td><td>Około 900 - 950 kg</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fsd">
+            <h2><img src="logofsd.png" height="35" style="vertical-align: middle;">FSD Nysa (Nysa 522)</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_nysa.jpg" alt="Zdjecie Nysy" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'dostawczy')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Niezastąpiony brat cioteczny Żuka z Zakładów Samochodowych w Nysie. Przez charakterystyczny "smutny" wyraz reflektorów zyskała przydomek "Smutek".
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1958 – 1994</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Zakład Samochodów Dostawczych (FSD), Nysa</td></tr>
+                <tr><td>Wersje silnikowe</td><td>S-21 (górnozaworowy 2.1 l, moc 70 KM)</td></tr>
+                <tr><td>Cena kiedyś</td><td>Towar deficytowy dla handlu, milicji, pogotowia ratunkowego i straży pożarnej</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 8 000 – 25 000 zł</td></tr>
+                <tr><td>Przeznaczenie</td><td>Towarowy, mikrobus, sanitarka, Nysa "towos"</td></tr>
+            </table>
+        </div>
+
+        <div class="auto-box" data-producent="fsd">
+            <h2><img src="logo_tarpan.png" height="35" style="vertical-align: middle;">FSR Tarpan</h2>
+            <div style="text-align: center; margin: 15px 0;">
+                <img src="foto_tarpan.jpg" alt="Zdjecie Tarpana" style="border: 3px ridge #ccc; max-width: 400px; height: auto; cursor: pointer;" onclick="odtwarzDzwiekKlikniecia(); pokazZdjecie(this.src, 'dostawczy')">
+            </div>
+            <p style="text-align: left; line-height: 1.5;">
+                <strong>Opis:</strong> Narodzony w Wielkopolsce hybrydowy wół roboczy polskiego rolnictwa – w połowie samochód osobowy, a w połowie solidna ciężarówka.
+            </p>
+            <table border="4">
+                <tr><th>Parametr</th><th>Wartość</th></tr>
+                <tr><td>Lata produkcji</td><td>1973 – 1991</td></tr>
+                <tr><td>Miejsce produkcji</td><td>Fabryka Samochodów Rolniczych (FSR), Poznań-Antoninek</td></tr>
+                <tr><td>Wersje silnikowe</td><td>S-21 (benzyna), silniki Perkins (diesel), Fiat 2.4D</td></tr>
+                <tr><td>Cena kiedyś</td><td>Rozprowadzany w ramach zaopatrzenia rolnictwa i kół gospodyń</td></tr>
+                <tr><td>Cena teraz</td><td>ok. 7 000 – 22 000 zł</td></tr>
+                <tr><td>Cechy szczególne</td><td>Słynna przesuwna ściana grodziowa (zmiana kabiny na skrzynię ładunkową)</td></tr>
+            </table>
+        </div>
+
+        <div class="bottom-fixed-area">
+            <!-- RUCHOMY PASEK MARQUEE -->
+            <div class="retro-marquee-bar">
+                <marquee scrollamount="6">
+                    *** WITAJ NA STRONIE PCHLASZA! *** POZDROWIENIA DLA WSZYSTKICH FANÓW SKANER I AKCENTU! *** ZAPRASZAMY DO WPISÓW W KSIĘDZE GOŚCI! *** NIECH ŻYJE MOTORYZACJA PRL! ***
+                </marquee>
+            </div>
+            
+            <div class="footer-content">
+                <div class="netscape-badge" onclick="odtwarzDzwiekKlikniecia(); pokazKomunikatOptymalizacji()">
+                    [ Netscape Navigator 4.0 ]<br>Najlepiej w 800x600
+                </div>
+                <div style="font-weight: bold; color: black; font-family: 'Courier New', Courier, monospace; font-size: 11px;">
+                    Copyright &copy; 2026 Pchlasz. Wszelkie prawa zastrzeżone. | Odwiedziny: <span class="hit-counter">004829</span>
+                </div>
+                <div class="netscape-badge" style="color: #ffff00;" onclick="odtwarzDzwiekKlikniecia(); pokazKomunikatOptymalizacji()">
+                    [ Windows 98 SE ]<br>Zatwierdzono przez PRL
+                </div>
+            </div>
+        </div>
+        
+        <div id="okienko-zdjecie" onclick="zamknijZdjecie()">
+            <span class="zamknij-okienko">&times;</span>
+            <img class="okienko-zawartosc" id="powiekszony-obraz">
+        </div>
+
+        <script>
+            function odtwarzDzwiekKlikniecia() {
+                var snd = document.getElementById("sound-click");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            function odtwarzDzwiekMenu() {
+                var snd = document.getElementById("sound-menu");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            function odtwarzDzwiekBledu() {
+                var snd = document.getElementById("sound-error");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+                alert("BŁĄD SYSTEMOWY: Nie możesz zamknąć odtwarzacza w Garażu PRL!");
+            }
+
+            function pokazKomunikatOptymalizacji() {
+                alert("GRATULACJE!\n\nPrzeglądasz Garaż Pchlasza w nowej przeglądarce, ale klimacik wczesnego internetu i zapach benzyny Extra 94 zostały zachowane!");
+            }
+
+            const bazyCytatow = [
+                "„Obywatelu! Nie przechodź na czerwonym świetle – państwo potrzebuje Cię żywego do budowy socjalizmu!”",
+                "„W ubiegłym tygodniu zapanował powszechny dobrobyt, niestety w tym tygodniu skończyły się kartki.”",
+                "„Bierzcie pożyczki, spłacicie w nowej walucie albo jak komunizm upadł!”",
+                "„Kupując Poloneza wspierasz polską myśl techniczną oraz lokalny zakład blacharski.”",
+                "„Kierowco! Pamiętaj: głośny wydech w Maluchu zastępuje radio, a brak hamulców uczy pokory.”",
+                "„Kolejka po mięso stoi tam, gdzie zwykle, tylko ocet rzucili naprzeciwko.”",
+                "„Zadbaj o swój wóz – nikt inny nie będzie chciał go ukraść z niestrzeżonego parkingu.”"
+            ];
+
+            const kluczeDzwiekow = ["polonez", "fiat", "dwusuw", "dostawczy"];
+
+            function wylosujCytat() {
+                const randomIndex = Math.floor(Math.random() * bazyCytatow.length);
+                document.getElementById("cytat-tresc").innerText = bazyCytatow[randomIndex];
+
+                const randomSoundKey = kluczeDzwiekow[Math.floor(Math.random() * kluczeDzwiekow.length)];
+                var audioEl = document.getElementById("dzwiek-" + randomSoundKey);
+                if (audioEl) {
+                    audioEl.currentTime = 0;
+                    audioEl.play().catch(e => console.log("Przeglądarka zablokowała auto-odtwarzanie dźwięku"));
+                }
+            }
+
+            const tekstDoWpisania = "NAJBARDZIEJ ZJEBANA STRONA O MOTORYZACJI PRL-OWSKIEJ NA POLSKIM INTERNECIE";
+            let indeks = 0;
+            
+            function piszTekst() {
+                const elementTekstu = document.getElementById("efekt-tekst");
+                if (elementTekstu && indeks < tekstDoWpisania.length) {
+                    elementTekstu.innerHTML += tekstDoWpisania.charAt(indeks);
+                    indeks++;
+                    setTimeout(piszTekst, 50);
+                }
+            }
+
+            function pokazZdjecie(zrodlo, typDzwieku) {
+                document.getElementById("okienko-zdjecie").style.display = "block";
+                document.getElementById("powiekszony-obraz").src = zrodlo;
+
+                if (typDzwieku) {
+                    var audioEl = document.getElementById("dzwiek-" + typDzwieku);
+                    if (audioEl) {
+                        audioEl.currentTime = 0;
+                        audioEl.play().catch(e => console.log("Przeglądarka zablokowała auto-odtwarzanie dźwięku"));
+                    }
+                }
+            }
+
+            function zamknijZdjecie() {
+                document.getElementById("okienko-zdjecie").style.display = "none";
+            }
+
+            function toggleDropdown() {
+                var wrapper = document.getElementById("customSelect");
+                wrapper.classList.toggle("open");
+            }
+
+            window.onclick = function(event) {
+                if (!event.target.closest('#customSelect')) {
+                    var customSelect = document.getElementById("customSelect");
+                    if (customSelect) customSelect.classList.remove("open");
+                }
+            }
+
+            function wybierzOpcje(wartosc, tekst, ikona) {
+                var label = document.getElementById("selected-label");
+                
+                if (ikona) {
+                    label.innerHTML = '<img src="' + ikona + '" style="height:18px; vertical-align:middle; margin-right:5px;"> ' + tekst;
+                } else {
+                    label.innerText = tekst;
+                }
+
+                document.getElementById("customSelect").classList.remove("open");
+
+                var auta = document.getElementsByClassName("auto-box");
+                for (var i = 0; i < auta.length; i++) {
+                    var prod = auta[i].getAttribute("data-producent");
+                    
+                    if (wartosc === "wszystkie" || prod === wartosc) {
+                        auta[i].style.display = "block";
+                        auta[i].style.animation = 'none';
+                        auta[i].offsetHeight; 
+                        auta[i].style.animation = 'fadeIn 0.4s ease-in-out';
+                    } else {
+                        auta[i].style.display = "none";
+                    }
+                }
+            }
+
+            const playlista = [
+                { nazwa: "01. Skaner - Wakacyjny Romans.mp3", src: "muzyka.mp3" },
+                { nazwa: "02. Skaner - American Boy.mp3", src: "muzyka2.mp3" },
+                { nazwa: "03. Skaner - Nadzieja.mp3", src: "muzyka3.mp3" },
+                { nazwa: "04. Akcent - Zycie to są Chwile.mp3", src: "CHWILE.mp3" },
+                { nazwa: "05. Akcent - Oj Ne Ne Ne.mp3", src: "NENENE.mp3" },
+                { nazwa: "06. Akcent - Na Zawsze Ty.mp3", src: "ZAWSZETY.mp3" },
+                { nazwa: "07. Akcent - Królowa Nocy.mp3", src: "KRÓLOWA.mp3" },
+                { nazwa: "08. Akcent - Moja Gwiazda.mp3", src: "GWIAZDA.mp3" }
+            ];
+
+            let aktualnyUtworsIndex = parseInt(localStorage.getItem("audioIndex")) || 0;
+
+            document.addEventListener("DOMContentLoaded", function() {
+                piszTekst();
+                wylosujCytat();
+
+                var audio = document.getElementById("bg-music");
+                var titleElem = document.getElementById("song-title");
+                var btnElem = document.getElementById("play-pause-btn");
+                if (!audio) return;
+
+                function zaladujUtwor(index, startPlaying = false, savedTime = 0) {
+                    audio.src = playlista[index].src;
+                    titleElem.innerText = playlista[index].nazwa;
+                    audio.currentTime = savedTime;
+                    
+                    if (startPlaying) {
+                        audio.play().then(() => {
+                            btnElem.innerText = "Pauza";
+                            localStorage.setItem("audioPlaying", "true");
+                        }).catch(err => {
+                            btnElem.innerText = "Start";
+                            localStorage.setItem("audioPlaying", "false");
+                        });
+                    } else {
+                        btnElem.innerText = "Start";
+                    }
+                }
+
+                var savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+                var isPlaying = localStorage.getItem("audioPlaying") === "true";
+
+                zaladujUtwor(aktualnyUtworsIndex, isPlaying, savedTime);
+
+                audio.addEventListener("timeupdate", function() {
+                    localStorage.setItem("audioTime", audio.currentTime);
+                    localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                });
+
+                audio.addEventListener("ended", function() {
+                    aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+                    localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                    localStorage.setItem("audioTime", 0);
+                    zaladujUtwor(aktualnyUtworsIndex, true, 0);
+                });
+            });
+
+            function przelaczOdtwarzanie() {
+                var audio = document.getElementById("bg-music");
+                var btnElem = document.getElementById("play-pause-btn");
+                
+                if (audio.paused) {
+                    audio.play().then(() => {
+                        btnElem.innerText = "Pauza";
+                        localStorage.setItem("audioPlaying", "true");
+                    }).catch(e => {
+                        alert("Przeglądarka zablokowała autostart. Kliknij jeszcze raz!");
+                    });
+                } else {
+                    audio.pause();
+                    btnElem.innerText = "Start";
+                    localStorage.setItem("audioPlaying", "false");
+                }
+            }
+
+            function przelaczWyciszenie() {
+                var audio = document.getElementById("bg-music");
+                var muteBtn = document.getElementById("mute-btn");
+
+                if (audio.muted) {
+                    audio.muted = false;
+                    muteBtn.innerText = "🔊 Dźwięk: Wł.";
+                } else {
+                    audio.muted = true;
+                    muteBtn.innerText = "🔇 Dźwięk: Wył.";
+                }
+            }
+
+            function nastepnaPiosenka() {
+                aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+                zmienUtworBezposrednio();
+            }
+
+            function poprzedniaPiosenka() {
+                aktualnyUtworsIndex = (aktualnyUtworsIndex - 1 + playlista.length) % playlista.length;
+                zmienUtworBezposrednio();
+            }
+
+            function zmienUtworBezposrednio() {
+                var audio = document.getElementById("bg-music");
+                var titleElem = document.getElementById("song-title");
+                var btnElem = document.getElementById("play-pause-btn");
+
+                audio.src = playlista[aktualnyUtworsIndex].src;
+                titleElem.innerText = playlista[aktualnyUtworsIndex].nazwa;
+                audio.currentTime = 0;
+                
+                localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                localStorage.setItem("audioTime", 0);
+
+                audio.play().then(() => {
+                    btnElem.innerText = "Pauza";
+                    localStorage.setItem("audioPlaying", "true");
+                }).catch(e => {
+                    btnElem.innerText = "Start";
+                });
+            }
+        </script>
+    </body>
+</html>

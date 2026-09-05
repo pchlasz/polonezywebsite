@@ -1,0 +1,647 @@
+<html>
+    <head>
+        <style>
+            /* DÓŁ STRONY - KONTENER DLA PASEK MARQUEE + STOPKA */
+            .bottom-fixed-area {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                z-index: 9999;
+                background-color: #008080;
+            }
+
+            /* Styl paska Marquee na dole */
+            .retro-marquee-bar {
+                background-color: #000080;
+                border-top: 3px outset #fff;
+                border-bottom: 3px outset #fff;
+                color: #FFFF00;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                padding: 4px 0;
+            }
+
+            /* STOPKA COPYRIGHT + BANER NETSCAPE */
+            .footer-content {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                background-color: #c0c0c0;
+                border-top: 2px outset #fff;
+                padding: 4px 10px;
+                font-size: 10px;
+                font-family: Tahoma, sans-serif;
+            }
+
+            .netscape-badge {
+                border: 2px outset #fff;
+                background: #000;
+                color: #0f0;
+                padding: 2px 6px;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                cursor: pointer;
+                text-align: center;
+            }
+
+            .netscape-badge:active {
+                border: 2px inset #fff;
+            }
+
+            /* Styl dla tła całej strony */
+            body {
+                background-image: url("a.jpg");
+                background-size: cover;          
+                background-repeat: no-repeat;    
+                background-position: center;     
+                background-attachment: fixed;    
+                margin: 0;                       
+                padding-top: 80px;               
+                padding-bottom: 70px;
+                font-family: "Courier New", Courier, monospace;
+            }
+            h1 {text-align: center;}
+            p {text-align: center;}
+            div {text-align: center;}
+            
+            /* NOWE GÓRNE MENU W STYLU RETRO */
+            .gorne-menu {
+                position: fixed;                 
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: #dbdbdb;       
+                border-bottom: 3px outset #fff;  
+                z-index: 9999;                   
+                box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+            }
+            
+            .gorne-menu ul {
+                display: flex;                   
+                justify-content: center;         
+                align-items: center;
+                list-style-type: none;           
+                margin: 0;
+                padding: 10px 0;
+            }
+            
+            .gorne-menu li {
+                margin: 0 10px;                  
+                display: flex;
+                align-items: center;
+            }
+            
+            .gorne-menu a {
+                color: #0000FF;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 4px 8px;
+                border: 1px solid transparent; 
+            }
+            
+            .gorne-menu a:hover {
+                background-color: #000080;       
+                color: #FFFF00;                  
+                border: 1px outset #fff;         
+                border-radius: 0px;              
+            }
+
+            /* NAGŁÓWKI SEKCJI UGRUPOWAŃ */
+            .sekcja-tytul {
+                width: 600px;
+                margin: 25px auto 10px auto;
+                text-align: center;
+            }
+            .sekcja-tytul table {
+                margin: 0 auto;
+            }
+
+            /* Styl okienek retro (Windows 95/98) */
+            .retro-window {
+                width: 600px;
+                margin: 20px auto;
+                border: 3px outset #fff;
+                background-color: #ccc;
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+                text-align: left;
+            }
+            .retro-window-title {
+                background-color: #000080;
+                padding: 3px 8px;
+                color: white;
+                font-size: 12px;
+                font-family: Tahoma, sans-serif;
+                font-weight: bold;
+            }
+            .retro-window-content {
+                background-color: #dbdbdb;
+                padding: 15px;
+                color: black;
+                font-size: 12px;
+                line-height: 1.5;
+            }
+
+            /* Kontener na zdjęcie z podpowiedzią */
+            .postac-img-container {
+                float: left;
+                margin-right: 15px;
+                margin-bottom: 5px;
+                position: relative;
+            }
+            .postac-img {
+                border: 3px ridge #ccc;
+                max-width: 140px;
+                height: auto;
+                display: block;
+                cursor: pointer;
+            }
+            .postac-img:hover {
+                border-color: #000080;
+            }
+            .postac-img-container::after {
+                content: "Kliknij, aby powiększyć";
+                position: absolute;
+                bottom: -18px;
+                left: 0;
+                width: 100%;
+                font-size: 9px;
+                text-align: center;
+                color: #444;
+                font-family: Tahoma, sans-serif;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.2s;
+            }
+            .postac-img-container:hover::after {
+                opacity: 1;
+            }
+
+            /* Styl dla okna powiększonego zdjęcia (modal) */
+            #modal-zdjecie {
+                display: none;
+                position: fixed;
+                z-index: 10000;
+                padding-top: 100px;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.8);
+            }
+            #modal-content {
+                margin: auto;
+                display: block;
+                max-width: 80%;
+                max-height: 80vh;
+                border: 4px outset #fff;
+                background-color: #ccc;
+                padding: 5px;
+            }
+            #modal-close {
+                position: absolute;
+                top: 30px;
+                right: 50px;
+                color: #fff;
+                font-size: 40px;
+                font-weight: bold;
+                cursor: pointer;
+                font-family: Tahoma, sans-serif;
+            }
+
+            .retro-banner {
+                border: 3px outset #fff;
+                background-color: #000;
+                padding: 5px 10px;
+                display: inline-block;
+                text-decoration: none;
+                animation: blinker 1.5s linear infinite;
+            }
+            @keyframes blinker {
+                50% { opacity: 0.7; }
+            }
+
+            .dolny-google {
+                position: fixed;       
+                right: 20px;
+                bottom: 50px;
+                z-index: 998;
+            }
+            
+            /* Styl licznika odwiedzin LED */
+            .retro-counter {
+                background-color: #000;
+                color: #00ff00;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                font-size: 14px;
+                padding: 3px 6px;
+                border: 2px inset #fff;
+                display: inline-block;
+                letter-spacing: 2px;
+            }
+        </style>
+        <title>Pchlasz - Kultowe Alkohole PRL</title>
+        <link rel="shortcut icon" href="yourfile.gif" type="image/x-icon">
+    </head>
+    <body>
+
+        <!-- GLOBALNE DŹWIĘKI INTERFEJSU -->
+        <audio id="sound-click" src="click.mp3" preload="auto"></audio>
+        <audio id="sound-menu" src="menu.mp3" preload="auto"></audio>
+        <audio id="sound-error" src="error.mp3" preload="auto"></audio>
+
+        <!-- POZIOME MENU RETRO Z EFEKTEM PISANIA -->
+        <nav class="gorne-menu">
+            <ul>
+                <li style="margin-left: 20px; margin-right: 15px;">
+                    <img src="logo_paska.png" height="25" alt="Logo" style="vertical-align: middle;">
+                </li>
+
+                <li style="margin-right: auto; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: red; font-weight: bold; white-space: nowrap;" id="efekt-tekst">
+                    <!-- Tekst pisze się sam -->
+                </li>
+
+                <li style="margin-right: 10px; font-family: Tahoma; font-size: 13px; color: black;"><b>NAWIGACJA:</b></li>
+                <li><a href="strona testpwa.html" onclick="odtwarzDzwiekMenu()"><img src="1.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Główna</a></li>
+                <li><a href="odnosnik.html" onclick="odtwarzDzwiekMenu()"><img src="2.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Dodatkowa</a></li>
+                <li><a href="strona2.html" onclick="odtwarzDzwiekMenu()"><img src="3.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Księga Gości</a></li>
+                <li><a href="auta.html" onclick="odtwarzDzwiekMenu()"><img src="4.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Kultowe Auta PRL</a></li>
+                <li><a href="osoby.html" onclick="odtwarzDzwiekMenu()"><img src="5.gif" height="18" style="vertical-align: middle; margin-right: 4px;">(Ważne Osoby PRL)</a></li>
+                <li><a href="radio.html" onclick="odtwarzDzwiekMenu()"><img src="6.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Radio PRL</a></li>
+                <li><a href="alkohole.html" onclick="odtwarzDzwiekMenu()"><img src="7.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Alkohole PRL</a></li>
+            </ul>
+        </nav>
+
+        <div style="text-align: center; margin: 15px 0;">
+            <img src="TEST.png" width="500" alt="Test">
+        </div>
+        
+        <!-- NAGłÓWEK STRONY -->
+        <div style="text-align: center; margin: 20px 0;">
+            <table align="center" border="3" bgcolor="#000080" cellpadding="6" cellspacing="0" style="display: inline-block;">
+                <tr>
+                    <td style="color: yellow; font-family: 'Courier New'; font-size: 16px; font-weight: bold;">
+                        --- PROCENTOWY KLIMAT: KULTOWE ALKOHOLE PRL-U ---
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- LICZNIK ODWIEDZIN -->
+        <div style="text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 11px; font-family: Tahoma; font-weight: bold;">Jesteś <span class="retro-counter">007421</span>. obywatelem odwiedzającym ten magazyn!</span>
+        </div>
+
+        <!-- SEKCJA: WÓDKI I CZYSTE -->
+        <div class="sekcja-tytul">
+            <table border="2" bgcolor="#555" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td style="color: #fff; font-size: 11px; font-family: Tahoma; text-align: center;">
+                        <b>=== BIAŁE I GATUNKOWE (BTO) ===</b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="retro-window">
+            <div class="retro-window-title">1. Wódka Wyborowa - Narodowy Eksport</div>
+            <div class="retro-window-content" style="font-family: 'Courier New', monospace; overflow: hidden;">
+                <div class="postac-img-container">
+                    <img src="wyborowa.jpeg" alt="Wyborowa" class="postac-img" onerror="this.src='TEST.png'" onclick="odtwarzDzwiekKlikniecia(); otworzZdjecie(this.src)">
+                </div>
+                <b>Rodzaj:</b> Wódka czysta żytnia<br>
+                <b>Status:</b> Klasyk barowy i towar eksportowy PRL<br>
+                <b>Opis:</b> Butelka z charakterystyczną etykietą o kroju rombu. Obok czystej "Czystej" królowała Żubrówka z obowiązkowym Źdźbłem trawy żubrowej w środku oraz Starka trzymana latami w dębowych beczkach.
+            </div>
+        </div>
+
+        <!-- SEKCJA: WINA OWOCOWE I JELITOWE -->
+        <div class="sekcja-tytul">
+            <table border="2" bgcolor="#555" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td style="color: #fff; font-size: 11px; font-family: Tahoma; text-align: center;">
+                        <b>=== WINO MARKOWE (INSTRUMENTY PIECZĘCIOWE / PATYCZAKI) ===</b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="retro-window">
+            <div class="retro-window-title">2. Wino "Komandos" / "Patriota" - Instrument Skwerowy</div>
+            <div class="retro-window-content" style="font-family: 'Courier New', monospace; overflow: hidden;">
+                <div class="postac-img-container">
+                    <img src="komandos.jpeg" alt="Komandos" class="postac-img" onerror="this.src='TEST.png'" onclick="odtwarzDzwiekKlikniecia(); otworzZdjecie(this.src)">
+                </div>
+                <b>Rodzaj:</b> Wino patykowe / Jabol<br>
+                <b>Status:</b> Kultowy napój podwórkowy i ławkowy<br>
+                <b>Opis:</b> Tanio, mocno i z charakterystycznym, siarkowym posmakiem. "Wino marki wino" spożywane pod sklepem Społem miało niezliczoną ilość nazw: Komandos, Patyk, Wojtek czy Dziki Sad.
+            </div>
+        </div>
+
+        <!-- SEKCJA: ZASADA MONOPOLOWEGO OD 13:00 -->
+        <div class="sekcja-tytul">
+            <table border="2" bgcolor="#555" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td style="color: #fff; font-size: 11px; font-family: Tahoma; text-align: center;">
+                        <b>=== DEKRET WŁADZY LUDOWEJ ===</b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="retro-window">
+            <div class="retro-window-title">3. Przepis handlowy: Monopolowy od 13:00</div>
+            <div class="retro-window-content" style="font-family: 'Courier New', monospace; overflow: hidden;">
+                <div class="postac-img-container">
+                    <img src="godziny.jpeg" alt="Zegar" class="postac-img" onerror="this.src='TEST.png'" onclick="odtwarzDzwiekKlikniecia(); otworzZdjecie(this.src)">
+                </div>
+                <b>Godziny otwarcia:</b> Zakaz sprzedaży przed 13:00<br>
+                <b>Cel społeczny:</b> Walka z pijaństwem w zakładach pracy<br>
+                <b>Opis:</b> Zgodnie z wytycznymi, w sklepach monopolowych przed godziną 13:00 nie uświadczono kropli wysokoprocentowego trunku. Kolejki pod sklepami formowały się jednak znacznie wcześniej, by zdążyć przed rzuceniem towaru na ladę!
+            </div>
+        </div>
+
+        <!-- SEKCJA: ZAKĄSKI Z TAMTYCH LAT -->
+        <div class="sekcja-tytul">
+            <table border="2" bgcolor="#555" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td style="color: #fff; font-size: 11px; font-family: Tahoma; text-align: center;">
+                        <b>=== PRZEKĄSKI DO SETKI I GALARETY ===</b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="retro-window">
+            <div class="retro-window-title">4. Kultowy zestaw zakąskowy (Zimne nóżki i ogórek)</div>
+            <div class="retro-window-content" style="font-family: 'Courier New', monospace; overflow: hidden;">
+                <b>Asortyment:</b> Śledzik, ogórek kiszony, galareta z nóżek<br>
+                <b>Zastosowanie:</b> Neutralizacja mocy "Czystej"<br>
+                <b>Opis:</b> Nieodłącznym elementem picia wódki w tamtych czasach były tzw. "zakąski barowe". Ocet, musztarda sarepska, kiszony ogórek wyciągany z beczki oraz zimne nóżki z octem pozwalały przetrwać nawet najcięższą imprezę w peerelowskim M-3.
+            </div>
+        </div>
+
+        <!-- SEKCJA: KARTKI -->
+        <div class="sekcja-tytul">
+            <table border="2" bgcolor="#555" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td style="color: #fff; font-size: 11px; font-family: Tahoma; text-align: center;">
+                        <b>=== SYSTEM RACJONOWANIA (KARTKI NA ALKOHOL) ===</b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="retro-window">
+            <div class="retro-window-title">5. Kartki na wódkę w latach 80.</div>
+            <div class="retro-window-content" style="font-family: 'Courier New', monospace; overflow: hidden;">
+                <div class="postac-img-container">
+                    <img src="kartki.jpeg" alt="Kartki" class="postac-img" onerror="this.src='TEST.png'" onclick="odtwarzDzwiekKlikniecia(); otworzZdjecie(this.src)">
+                </div>
+                <b>Okres:</b> Kryzys lat 80. i stan wojenny<br>
+                <b>Zasady:</b> Przydział na dowód / kartki<br>
+                <b>Opis:</b> Wprowadzone oficjalnie, by ograniczyć spożycie i radzić sobie z brakami w zaopatrzeniu. Pół litra wódki "na miesiąc" (lub na ślub / stypę) było cenniejsze niż niejedna waluta obca.
+            </div>
+        </div>
+
+        <!-- SEKCJA: KSIĘGA SKARG I ZAŻALEŃ (FORMULARZ) -->
+        <div class="sekcja-tytul">
+            <table border="2" bgcolor="#555" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td style="color: #fff; font-size: 11px; font-family: Tahoma; text-align: center;">
+                        <b>=== SOCIALISTYCZNA KSIĘGA SKARG I ZAŻALEŃ ===</b>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="retro-window">
+            <div class="retro-window-title">6. Zgłoś zażalenie na zaopatrzenie sklepu</div>
+            <div class="retro-window-content" style="font-family: 'Courier New', monospace;">
+                <p style="text-align: left; margin-top: 0; font-style: italic; color: #333;">
+                    "Nie mamy pana płaszcza i co nam pan zrobi?" – wpisz swoje zażalenie na brak octu lub kolejkę w Społem:
+                </p>
+                <form onsubmit="event.preventDefault(); alert('Twoje zażalenie zostało przyjęte przez komitet i skierowane do rozpatrzenia w planie pięcioletnim!'); this.reset();">
+                    <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 3px;">Twoje imię / pseudonim:</label>
+                    <input type="text" style="width: 100%; padding: 4px; border: 2px inset #fff; background: #fff; font-family: 'Courier New'; margin-bottom: 8px;" required>
+                    
+                    <label style="font-size: 11px; font-weight: bold; display: block; margin-bottom: 3px;">Treść zażalenia:</label>
+                    <textarea style="width: 100%; height: 60px; padding: 4px; border: 2px inset #fff; background: #fff; font-family: 'Courier New'; margin-bottom: 8px;" required></textarea>
+                    
+                    <button type="submit" onclick="odtwarzDzwiekKlikniecia()" style="font-family: Tahoma; font-size: 11px; font-weight: bold; padding: 4px 10px; border: 2px outset #fff; background: #ccc; cursor: pointer;">Wyślij do Centrali</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- OKNO MODAL DO POWIĘKSZANIA ZDJĘĆ -->
+        <div id="modal-zdjecie" onclick="odtwarzDzwiekKlikniecia(); zamknijZdjecie()">
+            <span id="modal-close">&times;</span>
+            <img id="modal-content" alt="Powiększone zdjęcie">
+        </div>
+
+        <!-- PRZYKLEJONA SEKCJA DOLNA (MARQUEE + STOPKA) -->
+        <div class="bottom-fixed-area">
+            <div class="retro-marquee-bar">
+                <marquee scrollamount="6">
+                    *** PIWEK Z BECZKI I CZYSTEJ WYBOROWEJ NIGDY NIE ZAPOMINAMY! *** 100% NOSTALGIA Z PRL-U! *** ZAPRASZAMY DO ODWIEDZANIA INNYCH PODSTRON! ***
+                </marquee>
+            </div>
+
+            <div class="footer-content">
+                <div class="netscape-badge" onclick="pokazKomunikatOptymalizacji()">
+                    [ Netscape Navigator 4.0 ]<br>Najlepiej w 800x600
+                </div>
+                <div style="font-weight: bold; color: black;">
+                    Copyright &copy; 2026 Pchlasz. Wszelkie prawa zastrzeżone.
+                </div>
+                <div class="netscape-badge" style="color: #ffff00;" onclick="pokazKomunikatOptymalizacji()">
+                    [ Windows 98 SE ]<br>Zatwierdzono przez PRL
+                </div>
+            </div>
+        </div>
+
+        <!-- ODTWARZACZ MUZYKI PRL -->
+        <div style="position: fixed; right: 20px; bottom: 140px; z-index: 9999; text-align: center;">
+            <div style="background: #ccc; border: 3px outset #fff; padding: 8px 12px; text-align: center; width: 240px; box-shadow: 4px 4px 10px rgba(0,0,0,0.5);">
+                <div style="background-color: #000080; color: white; font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; margin-bottom: 6px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Radio.exe</span>
+                    <span style="cursor:pointer;" onclick="odtwarzDzwiekBledu()">[X]</span>
+                </div>
+                
+                <div id="song-title" style="background: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 10px; padding: 4px; margin-bottom: 6px; border: 2px inset #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    Ładowanie...
+                </div>
+
+                <audio id="bg-music" style="display: none;"></audio>
+                
+                <div>
+                    <button onclick="odtwarzDzwiekKlikniecia(); poprzedniaPiosenka()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; border: 2px outset #fff; background: #ccc; cursor: pointer;">&lt;&lt;</button>
+                    <button id="play-pause-btn" onclick="odtwarzDzwiekKlikniecia(); przelaczOdtwarzanie()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 8px; border: 2px outset #fff; background: #ccc; cursor: pointer;">Pauza</button>
+                    <button onclick="odtwarzDzwiekKlikniecia(); nastepnaPiosenka()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; border: 2px outset #fff; background: #ccc; cursor: pointer;">&gt;&gt;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LINK GOOGLE -->
+        <div class="dolny-google">
+            <table border="3" bgcolor="#ccc" cellpadding="5" cellspacing="0">
+                <tr>
+                    <td bgcolor="#000080" style="padding: 2px 5px; text-align: left;"><b style="color: white; font-size: 11px; font-family: Tahoma;">POLECANE STRONY</b></td>
+                </tr>
+                <tr>
+                    <td bgcolor="#dbdbdb" align="center" style="padding: 10px;">
+                        <a href="https://google.com" target="_blank" class="retro-banner" onclick="odtwarzDzwiekKlikniecia()">
+                            <span style="color: #ff0000; font-family: 'Courier New'; font-weight: bold; font-size: 14px;">G</span><span style="color: #ffcc00; font-family: 'Courier New'; font-weight: bold; font-size: 14px;">O</span><span style="color: #00ff00; font-family: 'Courier New'; font-weight: bold; font-size: 14px;">O</span><span style="color: #0000ff; font-family: 'Courier New'; font-weight: bold; font-size: 14px;">G</span><span style="color: #ff00ff; font-family: 'Courier New'; font-weight: bold; font-size: 14px;">L</span><span style="color: #00ffff; font-family: 'Courier New'; font-weight: bold; font-size: 14px;">E</span>
+                        </a>
+                        <br><span style="font-size: 10px; color: #333; font-family: Tahoma; display: block; margin-top: 4px;">KLIKNIJ TUTAJ!</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SKRYPTY -->
+        <script>
+            function odtwarzDzwiekKlikniecia() {
+                var snd = document.getElementById("sound-click");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+            function odtwarzDzwiekMenu() {
+                var snd = document.getElementById("sound-menu");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+            function odtwarzDzwiekBledu() {
+                var snd = document.getElementById("sound-error");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+                alert("BŁĄD SYSTEMOWY: Nie możesz zamknąć odtwarzacza!");
+            }
+            function pokazKomunikatOptymalizacji() {
+                alert("SYSTEM INFO:\nStrona optymalizowana pod Netscape Navigator 4.0!");
+            }
+            function otworzZdjecie(src) {
+                var modal = document.getElementById("modal-zdjecie");
+                var modalImg = document.getElementById("modal-content");
+                modal.style.display = "block";
+                modalImg.src = src;
+            }
+            function zamknijZdjecie() {
+                document.getElementById("modal-zdjecie").style.display = "none";
+            }
+
+            const tekstDoWpisania = "NAJBARDZIEJ ZJEBANA STRONA O MOTORYZACJI PRL-OWSKIEJ NA POLSKIM INTERNECIE";
+            let indeks = 0;
+            
+            function piszTekst() {
+                if (indeks < tekstDoWpisania.length) {
+                    document.getElementById("efekt-tekst").innerHTML += tekstDoWpisania.charAt(indeks);
+                    indeks++;
+                    setTimeout(piszTekst, 50); 
+                }
+            }
+
+            const playlista = [
+                { nazwa: "01. Skaner - Wakacyjny Romans.mp3", src: "muzyka.mp3" },
+                { nazwa: "02. Skaner - American Boy.mp3", src: "muzyka2.mp3" },
+                { nazwa: "03. Skaner - Nadzieja.mp3", src: "muzyka3.mp3" },
+                { nazwa: "04. Akcent - Zycie to są Chwile.mp3", src: "CHWILE.mp3" },
+                { nazwa: "05. Akcent - Oj Ne Ne Ne.mp3", src: "NENENE.mp3" },
+                { nazwa: "06. Akcent - Na Zawsze Ty.mp3", src: "ZAWSZETY.mp3" },
+                { nazwa: "07. Akcent - Królowa Nocy.mp3", src: "KRÓLOWA.mp3" },
+                { nazwa: "08. Akcent - Moja Gwiazda.mp3", src: "GWIAZDA.mp3" }
+            ];
+
+            let aktualnyUtworsIndex = parseInt(localStorage.getItem("audioIndex")) || 0;
+
+            document.addEventListener("DOMContentLoaded", function() {
+                piszTekst();
+
+                var audio = document.getElementById("bg-music");
+                var titleElem = document.getElementById("song-title");
+                var btnElem = document.getElementById("play-pause-btn");
+                if (!audio) return;
+
+                function zaladujUtwor(index, startPlaying = false, savedTime = 0) {
+                    audio.src = playlista[index].src;
+                    titleElem.innerText = playlista[index].nazwa;
+                    audio.currentTime = savedTime;
+                    
+                    if (startPlaying) {
+                        audio.play().then(() => {
+                            btnElem.innerText = "Pauza";
+                            localStorage.setItem("audioPlaying", "true");
+                        }).catch(err => {
+                            btnElem.innerText = "Start";
+                            localStorage.setItem("audioPlaying", "false");
+                        });
+                    }
+                }
+
+                var savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+                var isPlaying = localStorage.getItem("audioPlaying") === "true";
+
+                zaladujUtwor(aktualnyUtworsIndex, isPlaying, savedTime);
+
+                if (!isPlaying) {
+                    btnElem.innerText = "Start";
+                }
+
+                audio.addEventListener("timeupdate", function() {
+                    localStorage.setItem("audioTime", audio.currentTime);
+                    localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                });
+
+                audio.addEventListener("ended", function() {
+                    aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+                    localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                    localStorage.setItem("audioTime", 0);
+                    zaladujUtwor(aktualnyUtworsIndex, true, 0);
+                });
+            });
+
+            function przelaczOdtwarzanie() {
+                var audio = document.getElementById("bg-music");
+                var btnElem = document.getElementById("play-pause-btn");
+                
+                if (audio.paused) {
+                    audio.play();
+                    btnElem.innerText = "Pauza";
+                    localStorage.setItem("audioPlaying", "true");
+                } else {
+                    audio.pause();
+                    btnElem.innerText = "Start";
+                    localStorage.setItem("audioPlaying", "false");
+                }
+            }
+
+            function nastepnaPiosenka() {
+                aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+                zmienUtworBezposrednio();
+            }
+
+            function poprzedniaPiosenka() {
+                aktualnyUtworsIndex = (aktualnyUtworsIndex - 1 + playlista.length) % playlista.length;
+                zmienUtworBezposrednio();
+            }
+
+            function zmienUtworBezposrednio() {
+                var audio = document.getElementById("bg-music");
+                var titleElem = document.getElementById("song-title");
+                var btnElem = document.getElementById("play-pause-btn");
+
+                audio.src = playlista[aktualnyUtworsIndex].src;
+                titleElem.innerText = playlista[aktualnyUtworsIndex].nazwa;
+                audio.currentTime = 0;
+                
+                localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                localStorage.setItem("audioTime", 0);
+
+                audio.play().catch(e => {});
+                btnElem.innerText = "Pauza";
+                localStorage.setItem("audioPlaying", "true");
+            }
+        </script>
+    </body>
+</html>

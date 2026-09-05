@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            /* Styl dla tla calej strony */
+            body {
+                background-color: #008080; /* Klasyczny Windowsowy morski teal */
+                background-image: url("a.jpg");
+                background-size: cover;          
+                background-repeat: no-repeat;    
+                background-position: center;     
+                background-attachment: fixed;    
+                margin: 0;                       
+                font-family: "Courier New", Courier, monospace;
+                padding-top: 80px;               /* Miejsce na gorny pasek menu */
+                padding-bottom: 110px;           /* Miejsce na dolne paski przyklejone do dołu */
+            }
+
+            /* STYL DLA GÓRNEGO MENU RETRO */
+            .gorne-menu {
+                position: fixed;                 
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: #dbdbdb;       
+                border-bottom: 3px outset #fff;  
+                z-index: 9999;                   
+                box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+            }
+            
+            .gorne-menu ul {
+                display: flex;                   
+                justify-content: center;         
+                align-items: center;
+                list-style-type: none;           
+                margin: 0;
+                padding: 10px 0;
+            }
+            
+            .gorne-menu li {
+                margin: 0 10px;                  
+                display: flex;
+                align-items: center;
+            }
+            
+            .gorne-menu a {
+                color: #0000FF;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 4px 8px;
+                border: 1px solid transparent; 
+            }
+            
+            .gorne-menu a:hover {
+                background-color: #000080;       
+                color: #FFFF00;                  
+                border: 1px outset #fff;         
+                border-radius: 0px;              
+            }
+
+            /* GŁÓWNY UKŁAD STRONY (RADIO + GIF PO PRAWEJ) */
+            .main-container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 40px;
+                margin: 30px auto 10px auto;
+                flex-wrap: wrap;
+                padding: 0 20px;
+            }
+
+            /* Główne okno radia w stylu Winamp / Okienko systemowe PRL */
+            .radio-window {
+                width: 480px;
+                background-color: #ccc;
+                border: 3px outset #fff;
+                box-shadow: 5px 5px 15px rgba(0,0,0,0.7);
+                transition: all 0.2s ease;
+            }
+
+            .window-title {
+                background-color: #000080;
+                padding: 4px 8px;
+                text-align: left;
+                color: white;
+                font-size: 13px;
+                font-family: Tahoma, sans-serif;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            .window-buttons {
+                display: flex;
+                gap: 3px;
+            }
+
+            .win-btn {
+                font-size: 10px;
+                background: #c0c0c0;
+                color: black;
+                padding: 0 5px;
+                border: 1px outset #fff;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+            .win-btn:active {
+                border: 1px inset #fff;
+            }
+
+            .window-content {
+                background-color: #dbdbdb;
+                padding: 15px;
+                text-align: center;
+                display: block;
+            }
+
+            /* Ekranik LCD */
+            .lcd-screen {
+                background: #000;
+                color: #0f0;
+                font-family: 'Courier New', monospace;
+                font-size: 13px;
+                padding: 8px 10px;
+                margin-bottom: 2px;
+                border: 2px inset #fff;
+                text-align: left;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Informacja o autorze + Wskaźniki Unitra (Stereo/Mono) */
+            .info-panel {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+                padding: 0 2px;
+            }
+
+            .song-author {
+                font-family: Tahoma, sans-serif;
+                font-size: 10px;
+                color: #222;
+                font-weight: bold;
+                text-align: left;
+            }
+
+            .unitra-indicators {
+                display: flex;
+                gap: 8px;
+                font-family: 'Courier New', monospace;
+                font-size: 9px;
+                font-weight: bold;
+            }
+
+            .indicator {
+                background: #220000;
+                color: #555;
+                padding: 1px 4px;
+                border: 1px inset #fff;
+            }
+
+            .indicator.active {
+                background: #f00;
+                color: #ff0;
+                box-shadow: 0 0 4px #f00;
+            }
+
+            /* Wizualizer audio */
+            .visualizer {
+                background: #000;
+                border: 2px inset #fff;
+                height: 35px;
+                margin-bottom: 12px;
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                padding: 0 5px 2px 5px;
+            }
+
+            .bar {
+                width: 8px;
+                background-color: #0f0;
+                height: 3px;
+                transition: height 0.1s ease;
+            }
+
+            /* Panel kontrolny (przyciski + głośność) */
+            .control-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                margin-bottom: 12px;
+                background: #c0c0c0;
+                border: 2px inset #fff;
+                padding: 10px;
+            }
+
+            .buttons-row {
+                display: flex;
+                justify-content: center;
+                gap: 4px;
+                flex-wrap: wrap;
+            }
+
+            /* Przyciski retro */
+            .retro-btn {
+                font-family: Tahoma, sans-serif;
+                font-size: 11px;
+                font-weight: bold;
+                padding: 5px 10px;
+                border: 2px outset #fff;
+                background: #ccc;
+                cursor: pointer;
+            }
+
+            .retro-btn:active {
+                border: 2px inset #fff;
+            }
+
+            .retro-btn.active-shuffle {
+                background: #b5b5b5;
+                border: 2px inset #fff;
+                color: #000080;
+            }
+
+            /* Panel głośności */
+            .volume-box {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                font-family: Tahoma, sans-serif;
+                font-size: 11px;
+                font-weight: bold;
+            }
+
+            .volume-box input[type=range] {
+                accent-color: #000080;
+                cursor: pointer;
+            }
+
+            /* Rozwijana / Stała Playlista */
+            .playlist-container {
+                background: #000;
+                border: 2px inset #fff;
+                max-height: 110px;
+                overflow-y: auto;
+                text-align: left;
+                padding: 4px;
+                margin-bottom: 10px;
+            }
+
+            .playlist-item {
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+                color: #0f0;
+                padding: 2px 4px;
+                cursor: pointer;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .playlist-item:hover {
+                background: #003300;
+            }
+
+            .playlist-item.playing {
+                background: #000080;
+                color: #fff;
+                font-weight: bold;
+            }
+
+            .back-link {
+                display: inline-block;
+                margin-top: 5px;
+                color: #0000FF;
+                font-weight: bold;
+                text-decoration: none;
+                font-size: 12px;
+            }
+
+            .back-link:hover {
+                text-decoration: underline;
+                color: #FF0000;
+            }
+
+            /* Styl dla tańczącego gifa po prawej */
+            .dancing-gif-container {
+                text-align: center;
+                background: #ccc;
+                border: 3px outset #fff;
+                padding: 10px;
+                box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+            }
+
+            /* DÓŁ STRONY - KONTENER DLA PASEK MARQUEE + STOPKA */
+            .bottom-fixed-area {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                z-index: 9999;
+                background-color: #008080;
+            }
+
+            /* Styl paska Marquee na dole */
+            .retro-marquee-bar {
+                background-color: #000080;
+                border-top: 3px outset #fff;
+                border-bottom: 3px outset #fff;
+                color: #FFFF00;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                padding: 4px 0;
+            }
+
+            /* STOPKA COPYRIGHT + BANER NETSCAPE */
+            .footer-content {
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+                background-color: #c0c0c0;
+                border-top: 2px outset #fff;
+                padding: 4px 10px;
+                font-size: 10px;
+                font-family: Tahoma, sans-serif;
+            }
+
+            .netscape-badge {
+                border: 2px outset #fff;
+                background: #000;
+                color: #0f0;
+                padding: 2px 6px;
+                font-family: 'Courier New', monospace;
+                font-weight: bold;
+                cursor: pointer;
+                text-align: center;
+            }
+
+            .netscape-badge:active {
+                border: 2px inset #fff;
+            }
+        </style>
+        <title>Pchlasz - Radio PRL</title>
+        <link rel="shortcut icon" href="yourfile.gif" type="image/x-icon">
+    </head>
+    <body>
+<script>
+    // Automatyczna próba wznowienia po przejściu z innej podstrony
+    window.addEventListener('DOMContentLoaded', () => {
+        var audio = document.getElementById("bg-music");
+        var shouldPlay = localStorage.getItem("audioPlaying") === "true";
+        if (audio && shouldPlay) {
+            audio.play().catch(e => {
+                // Przeglądarka zablokowała autoplay – użytkownik musi kliknąć "Start"
+                console.log("Autoplay zablokowany przez przeglądarkę.");
+            });
+        }
+    });
+</script>
+         <!-- POZIOME MENU RETRO Z EFEKTEM PISANIA -->
+        <nav class="gorne-menu">
+            <ul>
+                <li style="margin-left: 20px; margin-right: 15px;">
+                    <img src="logo_paska.png" height="25" alt="Logo" style="vertical-align: middle;">
+                </li>
+
+                <li style="margin-right: auto; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: red; font-weight: bold; white-space: nowrap;" id="efekt-tekst">
+                    <!-- Tekst pisze się sam -->
+                </li>
+
+                <li style="margin-right: 10px; font-family: Tahoma; font-size: 13px; color: black;"><b>NAWIGACJA:</b></li>
+                <li><a href="strona testpwa.html" onclick="odtwarzDzwiekMenu()"><img src="1.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Główna</a></li>
+                <li><a href="odnosnik.html" onclick="odtwarzDzwiekMenu()"><img src="2.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Dodatkowa</a></li>
+                <li><a href="strona2.html" onclick="odtwarzDzwiekMenu()"><img src="3.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Księga Gości</a></li>
+                <li><a href="auta.html" onclick="odtwarzDzwiekMenu()"><img src="4.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Kultowe Auta PRL</a></li>
+                <li><a href="osoby.html" onclick="odtwarzDzwiekMenu()"><img src="5.gif" height="18" style="vertical-align: middle; margin-right: 4px;">(Ważne Osoby PRL)</a></li>
+                <li><a href="radio.html" onclick="odtwarzDzwiekMenu()"><img src="6.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Radio PRL</a></li>
+                <li><a href="alkohole.html" onclick="odtwarzDzwiekMenu()"><img src="7.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Alkohole PRL</a></li>
+            </ul>
+        </nav>
+
+        <!-- KONTENER ZAWIERAJĄCY RADIO ORAZ GIF PO PRAWEJ -->
+        <div class="main-container">
+            <!-- GŁÓWNE OKNO RADIA -->
+            <div class="radio-window" id="radio-window-box">
+                <div class="window-title" onclick="zwiynOkno()">
+                    <span>Pchlasz_Radio_Player.exe</span>
+                    <div class="window-buttons">
+                        <span class="win-btn" onclick="zwiynOkno(event); odtwarzDzwiekKlikniecia();" title="Minimalizuj">_</span>
+                        <span class="win-btn" onclick="odtwarzDzwiekBledu()" title="Zamknij">[X]</span>
+                    </div>
+                </div>
+                
+                <div class="window-content" id="window-content-body">
+                    <img src="radio.png" alt="Radio Logo" style="max-width: 75%; margin-bottom: 10px;">
+                    
+                    <!-- Wyświetlacz piosenki -->
+                    <div id="song-title" class="lcd-screen">
+                        Ładowanie stacji...
+                    </div>
+                    
+                    <!-- Informacje o autorze + Wskaźniki Stereo/Mono -->
+                    <div class="info-panel">
+                        <div id="song-author" class="song-author">Autor: --</div>
+                        <div class="unitra-indicators">
+                            <span id="ind-mono" class="indicator">MONO</span>
+                            <span id="ind-stereo" class="indicator active">STEREO</span>
+                        </div>
+                    </div>
+
+                    <!-- Wizualizer audio w stylu retro -->
+                    <div class="visualizer" id="vis">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+
+                    <audio id="bg-music" style="display: none;"></audio>
+                    
+                    <!-- Panel sterowania (Przyciski + Suwak głośności) -->
+                    <div class="control-panel">
+                        <div class="buttons-row">
+                            <button class="retro-btn" onclick="odtwarzDzwiekKlikniecia(); poprzedniaPiosenka()">&lt;&lt; Poprz</button>
+                            <button id="play-pause-btn" class="retro-btn" onclick="odtwarzDzwiekKlikniecia(); przelaczOdtwarzanie()">Start</button>
+                            <button class="retro-btn" onclick="odtwarzDzwiekKlikniecia(); nastepnaPiosenka()">Nast &gt;&gt;</button>
+                            <button id="shuffle-btn" class="retro-btn" onclick="odtwarzDzwiekKlikniecia(); przelaczShuffle()">Shuffle: OFF</button>
+                        </div>
+                        <div class="volume-box">
+                            <span>Głośność:</span>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="1" oninput="zmienGlosnosc(this.value)">
+                        </div>
+                    </div>
+
+                    <!-- Klikalna lista utworów -->
+                    <div style="font-family: Tahoma; font-size: 10px; font-weight: bold; text-align: left; margin-bottom: 3px;">PLAYLISTA:</div>
+                    <div id="playlist-box" class="playlist-container">
+                        <!-- Generowana dynamicznie przez JS -->
+                    </div>
+
+                    <hr style="border: 1px inset #fff; margin: 10px 0;">
+                    
+                    <a href="strona testpwa.html" class="back-link" onclick="odtwarzDzwiekMenu()">&lt;&lt; Powrót na główną stronę Pchlasza</a>
+                </div>
+            </div>
+
+            <!-- TAŃCZĄCY GIF PO PRAWEJ STRONIE -->
+            <div class="dancing-gif-container">
+                <div style="background-color: #000080; color: white; font-family: Tahoma; font-size: 11px; font-weight: bold; padding: 3px; margin-bottom: 8px; text-align: left;">
+                    impreza.gif
+                </div>
+                <img src="yourfile.gif" alt="Tańczący GIF" style="max-width: 180px; height: auto; display: block;">
+            </div>
+        </div>
+
+        <!-- PRZYKLEJONA SEKCJA DOLNA (MARQUEE + STOPKA) -->
+        <div class="bottom-fixed-area">
+            <!-- RUCHOMY PASEK MARQUEE -->
+            <div class="retro-marquee-bar">
+                <marquee scrollamount="6">
+                    *** WITAJ NA STRONIE PCHLASZA! *** POZDROWIENIA DLA WSZYSTKICH FANÓW SKANER I AKCENTU! *** ZAPRASZAMY DO WPISÓW W KSIĘDZE GOŚCI! *** NIECH ŻYJE MOTORYZACJA PRL! ***
+                </marquee>
+            </div>
+
+            <!-- STOPKA Z COPYRIGHT I INTERAKTYWNYM BANEREM NETSCAPE -->
+            <div class="footer-content">
+                <div class="netscape-badge" onclick="pokazKomunikatOptymalizacji()">
+                    [ Netscape Navigator 4.0 ]<br>Najlepiej w 800x600
+                </div>
+                <div style="font-weight: bold; color: black;">
+                    Copyright &copy; 2026 Pchlasz. Wszelkie prawa zastrzeżone.
+                </div>
+                <div class="netscape-badge" style="color: #ffff00;" onclick="pokazKomunikatOptymalizacji()">
+                    [ Windows 98 SE ]<br>Zatwierdzono przez PRL
+                </div>
+            </div>
+        </div>
+
+        <!-- UKRYTE AUDIO DLA EFEKTÓW DŹWIĘKOWYCH SYSTEMU -->
+        <audio id="sound-click" src="click.mp3" preload="auto"></audio>
+        <audio id="sound-menu" src="menu.mp3" preload="auto"></audio>
+        <audio id="sound-error" src="error.mp3" preload="auto"></audio>
+
+        <!-- SKRYPTY -->
+            <!-- SKRYPTY -->
+        <script>
+            function odtwarzDzwiekKlikniecia() {
+                var snd = document.getElementById("sound-click");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            function odtwarzDzwiekMenu() {
+                var snd = document.getElementById("sound-menu");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            function odtwarzDzwiekBledu() {
+                var snd = document.getElementById("sound-error");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+                alert("BŁĄD SYSTEMOWY: Nie możesz zamknąć Pchlasz_Radio_Player.exe! Impreza trwa w najlepsze!");
+            }
+
+            function pokazKomunikatOptymalizacji() {
+                odtwarzDzwiekKlikniecia();
+                alert("GRATULACJE!\n\nPrzeglądasz stronę Pchlasza w nowoczesnej przeglądarce, ale system wykrył zapach spalonego styropianu i nostalgii z 2002 roku.\n\nStrona w 100% gotowa na zlot Maluchów!");
+            }
+
+            function zwiynOkno(e) {
+                if (e) e.stopPropagation();
+                var contentBody = document.getElementById("window-content-body");
+                if (contentBody.style.display === "none") {
+                    contentBody.style.display = "block";
+                } else {
+                    contentBody.style.display = "none";
+                }
+            }
+
+            const tekstDoWpisania = "NAJBARDZIEJ ZJEBANA STRONA O MOTORYZACJI PRL-OWSKIEJ NA POLSKIM INTERNECIE";
+            let indeks = 0;
+            
+            function piszTekst() {
+                if (indeks < tekstDoWpisania.length) {
+                    document.getElementById("efekt-tekst").innerHTML += tekstDoWpisania.charAt(indeks);
+                    indeks++;
+                    setTimeout(piszTekst, 50); 
+                }
+            }
+            
+            // Animacja wizualizatora oraz mrugania Unitry (Stereo/Mono)
+            setInterval(function() {
+                var audio = document.getElementById("bg-music");
+                var bars = document.getElementsByClassName("bar");
+                var stereoInd = document.getElementById("ind-stereo");
+                var monoInd = document.getElementById("ind-mono");
+
+                if (audio && !audio.paused) {
+                    if (Math.random() > 0.5) {
+                        stereoInd.classList.add("active");
+                        monoInd.classList.remove("active");
+                    } else {
+                        stereoInd.classList.remove("active");
+                        monoInd.classList.add("active");
+                    }
+
+                    for (var i = 0; i < bars.length; i++) {
+                        var randomHeight = Math.floor(Math.random() * 28) + 4;
+                        bars[i].style.height = randomHeight + "px";
+                    }
+                } else {
+                    stereoInd.classList.remove("active");
+                    monoInd.classList.add("active");
+                    for (var i = 0; i < bars.length; i++) {
+                        bars[i].style.height = "3px";
+                    }
+                }
+            }, 120);
+
+            // Playlista radiowa
+            const playlista = [
+                { nazwa: "01. Skaner - Wakacyjny Romans.mp3", autor: "Zespół Skaner", src: "muzyka.mp3" },
+                { nazwa: "02. Skaner - American Boy.mp3", autor: "Zespół Skaner", src: "muzyka2.mp3" },
+                { nazwa: "03. Skaner - Nadzieja.mp3", autor: "Zespół Skaner", src: "muzyka3.mp3" },
+                { nazwa: "04. Akcent - Zycie to są Chwile.mp3", autor: "Zenon Martyniuk / Akcent", src: "CHWILE.mp3" },
+                { nazwa: "05. Akcent - Oj Ne Ne Ne.mp3", autor: "Zenon Martyniuk / Akcent", src: "NENENE.mp3" },
+                { nazwa: "06. Akcent - Na Zawsze Ty.mp3", autor: "Zenon Martyniuk / Akcent", src: "ZAWSZETY.mp3" },
+                { nazwa: "07. Akcent - Królowa Nocy.mp3", autor: "Zenon Martyniuk / Akcent", src: "KRÓLOWA.mp3" },
+                { nazwa: "08. Akcent - Moja Gwiazda.mp3", autor: "Zenon Martyniuk / Akcent", src: "GWIAZDA.mp3" }
+            ];
+
+            let aktualnyUtworsIndex = parseInt(localStorage.getItem("audioIndex")) || 0;
+            let isShuffleActive = localStorage.getItem("audioShuffle") === "true";
+
+            function wyswietlPlaylistę() {
+                const box = document.getElementById("playlist-box");
+                if (!box) return;
+                box.innerHTML = "";
+                playlista.forEach((utwor, index) => {
+                    const div = document.createElement("div");
+                    div.className = "playlist-item" + (index === aktualnyUtworsIndex ? " playing" : "");
+                    div.innerText = utwor.nazwa;
+                    div.onclick = function() {
+                        odtwarzDzwiekKlikniecia();
+                        aktualnyUtworsIndex = index;
+                        zmienUtworBezposrednio(true);
+                    };
+                    box.appendChild(div);
+                });
+            }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                piszTekst();
+
+                var audio = document.getElementById("bg-music");
+                var titleElem = document.getElementById("song-title");
+                var authorElem = document.getElementById("song-author");
+                var btnElem = document.getElementById("play-pause-btn");
+                var volumeSlider = document.getElementById("volume-slider");
+                var shuffleBtn = document.getElementById("shuffle-btn");
+                if (!audio) return;
+
+                if (isShuffleActive) {
+                    shuffleBtn.innerText = "Shuffle: ON";
+                    shuffleBtn.classList.add("active-shuffle");
+                }
+
+                var savedVolume = parseFloat(localStorage.getItem("audioVolume"));
+                if (!isNaN(savedVolume)) {
+                    audio.volume = savedVolume;
+                    volumeSlider.value = savedVolume;
+                }
+
+                // Pobieramy zapisany czas i stan odtwarzania z poprzedniej strony
+                var savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+                var shouldPlay = localStorage.getItem("audioPlaying") === "true";
+
+                // Ustawiamy źródło utworu
+                audio.src = playlista[aktualnyUtworsIndex].src;
+                titleElem.innerText = playlista[aktualnyUtworsIndex].nazwa;
+                authorElem.innerText = "Autor: " + playlista[aktualnyUtworsIndex].autor;
+                
+                // Przywracamy zapamiętany moment utworu
+                audio.currentTime = savedTime;
+                wyswietlPlaylistę();
+
+                if (shouldPlay) {
+                    audio.play().then(() => {
+                        btnElem.innerText = "Pauza";
+                    }).catch(e => {
+                        btnElem.innerText = "Start";
+                        localStorage.setItem("audioPlaying", "false");
+                    });
+                } else {
+                    btnElem.innerText = "Start";
+                }
+
+                // Na bieżąco zapisujemy sekundę utworu w pamięci przeglądarki
+                audio.addEventListener("timeupdate", function() {
+                    localStorage.setItem("audioTime", audio.currentTime);
+                    localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                });
+
+                audio.addEventListener("ended", function() {
+                    nastepnaPiosenka(true);
+                });
+            });
+
+            function przelaczOdtwarzanie() {
+                var audio = document.getElementById("bg-music");
+                var btnElem = document.getElementById("play-pause-btn");
+                
+                if (audio.paused) {
+                    audio.play().then(() => {
+                        btnElem.innerText = "Pauza";
+                        localStorage.setItem("audioPlaying", "true");
+                    }).catch(e => {
+                        alert("Przeglądarka zablokowała autostart. Kliknij Start jeszcze raz!");
+                    });
+                } else {
+                    audio.pause();
+                    btnElem.innerText = "Start";
+                    localStorage.setItem("audioPlaying", "false");
+                }
+            }
+
+            function nastepnaPiosenka(autoEnd = false) {
+                if (isShuffleActive) {
+                    let nowyIndex;
+                    do {
+                        nowyIndex = Math.floor(Math.random() * playlista.length);
+                    } while (nowyIndex === aktualnyUtworsIndex && playlista.length > 1);
+                    aktualnyUtworsIndex = nowyIndex;
+                } else {
+                    aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+                }
+                zmienUtworBezposrednio(true);
+            }
+
+            function poprzedniaPiosenka() {
+                aktualnyUtworsIndex = (aktualnyUtworsIndex - 1 + playlista.length) % playlista.length;
+                zmienUtworBezposrednio(true);
+            }
+
+            function zmienUtworBezposrednio(play = false) {
+                var audio = document.getElementById("bg-music");
+                var titleElem = document.getElementById("song-title");
+                var authorElem = document.getElementById("song-author");
+                var btnElem = document.getElementById("play-pause-btn");
+
+                audio.src = playlista[aktualnyUtworsIndex].src;
+                titleElem.innerText = playlista[aktualnyUtworsIndex].nazwa;
+                authorElem.innerText = "Autor: " + playlista[aktualnyUtworsIndex].autor;
+                audio.currentTime = 0; // Przy ręcznej zmianie utworu startujemy od 0
+                
+                localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+                localStorage.setItem("audioTime", 0);
+                wyswietlPlaylistę();
+
+                if (play) {
+                    audio.play().then(() => {
+                        btnElem.innerText = "Pauza";
+                        localStorage.setItem("audioPlaying", "true");
+                    }).catch(e => {
+                        btnElem.innerText = "Start";
+                    });
+                } else {
+                    btnElem.innerText = "Start";
+                }
+            }
+
+            function zmienGlosnosc(val) {
+                var audio = document.getElementById("bg-music");
+                audio.volume = val;
+                localStorage.setItem("audioVolume", val);
+            }
+
+            function przelaczShuffle() {
+                isShuffleActive = !isShuffleActive;
+                localStorage.setItem("audioShuffle", isShuffleActive);
+                var shuffleBtn = document.getElementById("shuffle-btn");
+                
+                if (isShuffleActive) {
+                    shuffleBtn.innerText = "Shuffle: ON";
+                    shuffleBtn.classList.add("active-shuffle");
+                } else {
+                    shuffleBtn.innerText = "Shuffle: OFF";
+                    shuffleBtn.classList.remove("active-shuffle");
+                }
+            }
+        </script>
+    </body>
+</html>

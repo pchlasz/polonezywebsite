@@ -1,0 +1,415 @@
+<html>
+    <head>
+        <style>
+            /* DÓŁ STRONY - KONTENER DLA PASEK MARQUEE + STOPKA */
+.bottom-fixed-area {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background-color: #008080;
+}
+
+/* Styl paska Marquee na dole */
+.retro-marquee-bar {
+    background-color: #000080;
+    border-top: 3px outset #fff;
+    border-bottom: 3px outset #fff;
+    color: #FFFF00;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 0;
+}
+
+/* STOPKA COPYRIGHT + BANER NETSCAPE */
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #c0c0c0;
+    border-top: 2px outset #fff;
+    padding: 4px 10px;
+    font-size: 10px;
+    font-family: Tahoma, sans-serif;
+}
+
+.netscape-badge {
+    border: 2px outset #fff;
+    background: #000;
+    color: #0f0;
+    padding: 2px 6px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.netscape-badge:active {
+    border: 2px inset #fff;
+}
+            /* Styl dla tla calej strony */
+            body {
+                background-image: url("a.jpg");
+                background-size: cover;          
+                background-repeat: no-repeat;    
+                background-position: center;     
+                background-attachment: fixed;    
+                margin: 0;                       
+                font-family: "Courier New", Courier, monospace;
+                padding-top: 80px;               /* Miejsce na gorny pasek menu */
+            }
+            h1, h2 { text-align: center; color: darkblue; }
+            p { text-align: center; }
+            div { text-align: center; }
+
+            /* STYL DLA GÓRNEGO MENU RETRO */
+            .gorne-menu {
+                position: fixed;                 
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: #dbdbdb;       
+                border-bottom: 3px outset #fff;  
+                z-index: 9999;                   
+                box-shadow: 0px 2px 5px rgba(0,0,0,0.3);
+            }
+            
+            .gorne-menu ul {
+                display: flex;                   /* Układa elementy w jednej poziomej linii */
+                justify-content: center;         /* Centruje linki na srodku paska */
+                align-items: center;
+                list-style-type: none;           /* Usuwa czarne kropki */
+                margin: 0;
+                padding: 10px 0;
+            }
+            
+            .gorne-menu li {
+                margin: 0 10px;                  /* Zmniejszone odstepy, zeby tekst sie zmiescil */
+                display: flex;
+                align-items: center;
+            }
+            
+            .gorne-menu a {
+                color: #0000FF;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 13px;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 4px 8px;
+                border: 1px solid transparent; 
+            }
+            
+            .gorne-menu a:hover {
+                background-color: #000080;       /* Głęboki, klasyczny granat */
+                color: #FFFF00;                  /* Jaskrawy, żółty tekst po najechaniu */
+                border: 1px outset #fff;         /* Efekt wypukłego przycisku retro */
+                border-radius: 0px;              /* Ostry kant */
+            }
+
+            /* OKIENKA WPISÓW KSIĘGI GOŚCI */
+            .guestbook-window {
+                width: 500px;
+                margin: 20px auto;
+                border: 3px outset #fff;
+                background-color: #ccc;
+            }
+            .window-title {
+                background-color: #000080;
+                padding: 3px 8px;
+                text-align: left;
+                color: white;
+                font-size: 12px;
+                font-family: Tahoma, sans-serif;
+                font-weight: bold;
+            }
+            .window-content {
+                background-color: #dbdbdb;
+                padding: 12px;
+                text-align: left;
+                color: black;
+                font-size: 13px;
+            }
+            .stopka-retro {
+                position: fixed;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 999;
+            }
+        </style>
+        <title>Pchlasz - Ksiega Gosci</title>
+        <link rel="shortcut icon" href="yourfile.gif" type="image/x-icon">
+    </head>
+    <body>
+
+        <!-- GLOBALNE DŹWIĘKI INTERFEJSU -->
+        <audio id="sound-click" src="click.mp3" preload="auto"></audio>
+        <audio id="sound-menu" src="menu.mp3" preload="auto"></audio>
+        <audio id="sound-error" src="error.mp3" preload="auto"></audio>
+
+ <!-- POZIOME MENU RETRO Z EFEKTEM PISANIA -->
+        <nav class="gorne-menu">
+            <ul>
+                <li style="margin-left: 20px; margin-right: 15px;">
+                    <img src="logo_paska.png" height="25" alt="Logo" style="vertical-align: middle;">
+                </li>
+
+                <li style="margin-right: auto; font-family: 'Courier New', Courier, monospace; font-size: 12px; color: red; font-weight: bold; white-space: nowrap;" id="efekt-tekst">
+                    <!-- Tekst pisze się sam -->
+                </li>
+
+                <li style="margin-right: 10px; font-family: Tahoma; font-size: 13px; color: black;"><b>NAWIGACJA:</b></li>
+                <li><a href="strona testpwa.html" onclick="odtwarzDzwiekMenu()"><img src="1.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Główna</a></li>
+                <li><a href="odnosnik.html" onclick="odtwarzDzwiekMenu()"><img src="2.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Strona Dodatkowa</a></li>
+                <li><a href="strona2.html" onclick="odtwarzDzwiekMenu()"><img src="3.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Księga Gości</a></li>
+                <li><a href="auta.html" onclick="odtwarzDzwiekMenu()"><img src="4.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Kultowe Auta PRL</a></li>
+                <li><a href="osoby.html" onclick="odtwarzDzwiekMenu()"><img src="5.gif" height="18" style="vertical-align: middle; margin-right: 4px;">(Ważne Osoby PRL)</a></li>
+                <li><a href="radio.html" onclick="odtwarzDzwiekMenu()"><img src="6.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Radio PRL</a></li>
+                <li><a href="alkohole.html" onclick="odtwarzDzwiekMenu()"><img src="7.gif" height="18" style="vertical-align: middle; margin-right: 4px;">Alkohole PRL</a></li>
+            </ul>
+        </nav>
+<!-- RETRO ODTWARZACZ PRZYPIĘTY DO EKRANU (ZAWSZE WIDOCZNY) -->
+<div style="position: fixed; right: 20px; bottom: 90px; z-index: 9999; text-align: center;">
+    <div style="background: #ccc; border: 3px outset #fff; padding: 8px 12px; text-align: center; width: 240px; box-shadow: 4px 4px 10px rgba(0,0,0,0.5);">
+        <div style="background-color: #000080; color: white; font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; margin-bottom: 6px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+            <span>Radio.exe</span>
+            <span style="cursor:pointer;" onclick="odtwarzDzwiekBledu()">[X]</span>
+        </div>
+        <!-- PRZYKLEJONA SEKCJA DOLNA (MARQUEE + STOPKA) -->
+<div class="bottom-fixed-area">
+    <!-- RUCHOMY PASEK MARQUEE -->
+    <div class="retro-marquee-bar">
+        <marquee scrollamount="6">
+            *** WITAJ NA STRONIE PCHLASZA! *** POZDROWIENIA DLA WSZYSTKICH FANÓW SKANER I AKCENTU! *** ZAPRASZAMY DO WPISÓW W KSIĘDZE GOŚCI! *** NIECH ŻYJE MOTORYZACJA PRL! ***
+        </marquee>
+    </div>
+
+    <!-- STOPKA Z COPYRIGHT I INTERAKTYWNYM BANEREM NETSCAPE -->
+    <div class="footer-content">
+        <div class="netscape-badge" onclick="pokazKomunikatOptymalizacji()">
+            [ Netscape Navigator 4.0 ]<br>Najlepiej w 800x600
+        </div>
+        <div style="font-weight: bold; color: black;">
+            Copyright &copy; 2026 Pchlasz. Wszelkie prawa zastrzeżone.
+        </div>
+        <div class="netscape-badge" style="color: #ffff00;" onclick="pokazKomunikatOptymalizacji()">
+            [ Windows 98 SE ]<br>Zatwierdzono przez PRL
+        </div>
+    </div>
+</div>
+        <!-- Ekranik LCD z nazwą utworu -->
+        <div id="song-title" style="background: #000; color: #0f0; font-family: 'Courier New', monospace; font-size: 10px; padding: 4px; margin-bottom: 6px; border: 2px inset #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Ładowanie...
+        </div>
+
+        <audio id="bg-music" style="display: none;"></audio>
+        
+        <div>
+            <button onclick="odtwarzDzwiekKlikniecia(); poprzedniaPiosenka()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; border: 2px outset #fff; background: #ccc; cursor: pointer;">&lt;&lt;</button>
+            <button id="play-pause-btn" onclick="odtwarzDzwiekKlikniecia(); przelaczOdtwarzanie()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 8px; border: 2px outset #fff; background: #ccc; cursor: pointer;">Pauza</button>
+            <button onclick="odtwarzDzwiekKlikniecia(); nastepnaPiosenka()" style="font-family: Tahoma; font-size: 10px; font-weight: bold; padding: 2px 4px; border: 2px outset #fff; background: #ccc; cursor: pointer;">&gt;&gt;</button>
+        </div>
+    </div>
+</div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <img src="official.png" alt="Garaz Kultowych Aut PRL">
+        </div>
+        <p style="font-weight: bold; color: yellow; background: black; display: inline-block; padding: 5px; position: relative; left: 50%; transform: translateX(-50%);">Zostaw po sobie ślad ziomek!</p>
+
+        <!-- WPIS Z ŻARTEM O TURBO OD SPEJSONA, WOJTASA I WALO -->
+        <div class="guestbook-window">
+            <div class="window-title">Wpis #4 - Spejson_Wojtas_Walo_Grochow (Dodano: 24.08.2026)</div>
+            <div class="window-content">
+                Siemanko z Grochowa! Rozkminialiśmy z chłopakami, czy dałoby się wsadzić turbo do Poloneza... No ale po co ci turbo w Polonezie, jak zawieszenie jest z Poloneza, hamulce są z Poloneza i buda też z Poloneza? Jak to odpalisz i wciśnie cię w fotel, to ci się cała buda odwróci, a koła zostaną w miejscu! Pozdro z Warszawy Grochowo!
+            </div>
+        </div>
+
+        <!-- WPIS 1 -->
+        <div class="guestbook-window">
+            <div class="window-title">Wpis #3 - Dziara_98 (Dodano: 23.08.2026)</div>
+            <div class="window-content">
+                Siemanko Pchlasz! Zajebista strona, ten Polonezik na głównej robi robotę na dzielnicy. OHV musi klepać! Pozdro ze Szczecina, czekam na więcej podstron!
+            </div>
+        </div>
+
+        <!-- WPIS 2 -->
+        <div class="guestbook-window">
+            <div class="window-title">Wpis #2 - Seba_FSO (Dodano: 22.08.2026)</div>
+            <div class="window-content">
+                Stronka pierwsza klasa, przypominają się stare czasy kafejek internetowych i grania w Icy Tower. Pozdro dla wszystkich odwiedzających i dla Mammona XDDD
+            </div>
+        </div>
+
+        <!-- WPIS 3 (FORMULARZ DODAWANIA WPISU) -->
+        <div class="guestbook-window" style="margin-top: 40px; margin-bottom: 40px; width: 450px;">
+            <div class="window-title">DODAJ SWÓJ WPIS</div>
+            <div class="window-content" style="text-align: center;">
+                <form onsubmit="odtwarzDzwiekKlikniecia(); alert('Wysłaliśmy twój wpis do &quot;Kosz&quot; ustawione przez twórce strony'); return false;" style="margin: 0;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px; text-align: left;">Twój Nick:</label>
+                    <input type="text" required style="width: 100%; padding: 3px; margin-bottom: 10px;"><br>
+                    
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px; text-align: left;">Treść wiadomości:</label>
+                    <textarea required style="width: 100%; height: 80px; padding: 3px; margin-bottom: 10px; font-family: Arial;"></textarea><br>
+                    
+                    <button type="submit" onclick="odtwarzDzwiekKlikniecia()" style="cursor: pointer; padding: 4px 20px; font-weight: bold; font-family: Tahoma;">DODAJ WPIS!</button>
+                    <button type="reset" onclick="odtwarzDzwiekKlikniecia()" style="cursor: pointer; padding: 4px 15px; font-family: Tahoma;">Reset</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- STOPKA COPYRIGHT -->
+<div style="text-align: center; margin: 30px 0;">
+    <table align="center" border="2" bgcolor="white" cellpadding="8" cellspacing="0" style="font-family: 'Courier New', Courier, monospace; display: inline-block;">
+        <tr>
+            <td style="color: black; font-size: 12px; font-weight: bold;">
+                Copyright &copy; 2026 Pchlasz. Wszelkie prawa zastrzeżone.
+            </td>
+        </tr>
+    </table>
+</div>
+
+        <!-- SKRYPT DLA EFEKTU PISANIA NA MASZYNIE -->
+        <script>
+            function odtwarzDzwiekKlikniecia() {
+                var snd = document.getElementById("sound-click");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            function odtwarzDzwiekMenu() {
+                var snd = document.getElementById("sound-menu");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            function odtwarzDzwiekBledu() {
+                var snd = document.getElementById("sound-error");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+                alert("BŁĄD SYSTEMOWY: Nie możesz zamknąć odtwarzacza w księdze gości!");
+            }
+
+            const tekstDoWpisania = "NAJBARDZIEJ ZJEBANA STRONA O MOTORYZACJI PRL-OWSKIEJ NA POLSKIM INTERNECIE";
+            let indeks = 0;
+            
+            function piszTekst() {
+                if (indeks < tekstDoWpisania.length) {
+                    document.getElementById("efekt-tekst").innerHTML += tekstDoWpisania.charAt(indeks);
+                    indeks++;
+                    setTimeout(piszTekst, 50); 
+                }
+            }
+            
+            window.onload = function() {
+                piszTekst();
+            };
+        </script>
+<script>
+    // PLAYLISTA MUZYCZNA (Skaner)
+            const playlista = [
+                { nazwa: "01. Skaner - Wakacyjny Romans.mp3", src: "muzyka.mp3" },
+                { nazwa: "02. Skaner - American Boy.mp3", src: "muzyka2.mp3" },
+                { nazwa: "03. Skaner - Nadzieja.mp3", src: "muzyka3.mp3" },
+                { nazwa: "04. Akcent - Zycie to są Chwile.mp3", src: "CHWILE.mp3" },
+                { nazwa: "05. Akcent - Oj Ne Ne Ne.mp3", src: "NENENE.mp3" },
+                { nazwa: "06. Akcent - Na Zawsze Ty.mp3", src: "ZAWSZETY.mp3" },
+                { nazwa: "07. Akcent - Królowa Nocy.mp3", src: "KRÓLOWA.mp3" },
+                { nazwa: "08. Akcent - Moja Gwiazda.mp3", src: "GWIAZDA.mp3" },
+            ];
+
+    let aktualnyUtworsIndex = parseInt(localStorage.getItem("audioIndex")) || 0;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var audio = document.getElementById("bg-music");
+        var titleElem = document.getElementById("song-title");
+        var btnElem = document.getElementById("play-pause-btn");
+        if (!audio) return;
+
+        // Załaduj odpowiedni utwór
+        function zaladujUtwor(index, startPlaying = false, savedTime = 0) {
+            audio.src = playlista[index].src;
+            titleElem.innerText = playlista[index].nazwa;
+            audio.currentTime = savedTime;
+            
+            if (startPlaying) {
+                audio.play().then(() => {
+                    btnElem.innerText = "Pauza";
+                    localStorage.setItem("audioPlaying", "true");
+                }).catch(err => {
+                    console.log("Autoplay zablokowany");
+                    btnElem.innerText = "Start";
+                    localStorage.setItem("audioPlaying", "false");
+                });
+            }
+        }
+
+        var savedTime = parseFloat(localStorage.getItem("audioTime")) || 0;
+        var isPlaying = localStorage.getItem("audioPlaying") === "true";
+
+        // Inicjalizacja odtwarzacza
+        zaladujUtwor(aktualnyUtworsIndex, isPlaying, savedTime);
+
+        if (!isPlaying) {
+            btnElem.innerText = "Start";
+        }
+
+        // Zapisywanie stanu w locie
+        audio.addEventListener("timeupdate", function() {
+            localStorage.setItem("audioTime", audio.currentTime);
+            localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+        });
+
+        // Automatyczne przełączenie na następną piosenkę po zakończeniu
+        audio.addEventListener("ended", function() {
+            aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+            localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+            localStorage.setItem("audioTime", 0);
+            zaladujUtwor(aktualnyUtworsIndex, true, 0);
+        });
+    });
+
+    // Funkcje przycisków sterujących
+    function przelaczOdtwarzanie() {
+        var audio = document.getElementById("bg-music");
+        var btnElem = document.getElementById("play-pause-btn");
+        
+        if (audio.paused) {
+            audio.play();
+            btnElem.innerText = "Pauza";
+            localStorage.setItem("audioPlaying", "true");
+        } else {
+            audio.pause();
+            btnElem.innerText = "Start";
+            localStorage.setItem("audioPlaying", "false");
+        }
+    }
+
+    function nastepnaPiosenka() {
+        aktualnyUtworsIndex = (aktualnyUtworsIndex + 1) % playlista.length;
+        zmienUtworBezposrednio();
+    }
+
+    function poprzedniaPiosenka() {
+        aktualnyUtworsIndex = (aktualnyUtworsIndex - 1 + playlista.length) % playlista.length;
+        zmienUtworBezposrednio();
+    }
+
+    function zmienUtworBezposrednio() {
+        var audio = document.getElementById("bg-music");
+        var titleElem = document.getElementById("song-title");
+        var btnElem = document.getElementById("play-pause-btn");
+
+        audio.src = playlista[aktualnyUtworsIndex].src;
+        titleElem.innerText = playlista[aktualnyUtworsIndex].nazwa;
+        audio.currentTime = 0;
+        
+        localStorage.setItem("audioIndex", aktualnyUtworsIndex);
+        localStorage.setItem("audioTime", 0);
+
+        audio.play();
+        btnElem.innerText = "Pauza";
+        localStorage.setItem("audioPlaying", "true");
+    }
+</script>
+    </body>
+</html>
