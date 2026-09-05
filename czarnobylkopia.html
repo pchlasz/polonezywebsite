@@ -1,0 +1,705 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Pchlasz - Strefa Wykluczenia ☢️</title>
+        <!-- LEAFLET CSS DO INTERAKTYWNEJ MAPY -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <style>
+            /* TŁO I BAZA STRONY */
+            body {
+                background-color: #050505; 
+                background-image: url("chernobyl_background.avif"); 
+                background-size: cover;          
+                background-attachment: fixed;    
+                background-position: center;
+                margin: 0;                       
+                padding-top: 80px;               
+                font-family: "Courier New", Courier, monospace;
+                color: #c0c0c0;
+            }
+
+            /* GÓRNE MENU */
+            .gorne-menu {
+                position: fixed;                 
+                top: 0;
+                left: 0;
+                width: 100%;
+                background-color: rgba(26, 38, 26, 0.95);       
+                border-bottom: 2px solid #556b2f;  
+                z-index: 9999;                   
+                box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            }
+            .gorne-menu ul { display: flex; justify-content: center; align-items: center; list-style-type: none; margin: 0; padding: 10px 0; flex-wrap: wrap; }
+            .gorne-menu li { margin: 5px 10px; display: flex; align-items: center; }
+            .gorne-menu a {
+                color: #adff2f;
+                font-size: 13px;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 4px 8px;
+                border: 1px solid transparent;
+                transition: all 0.2s;
+            }
+            .gorne-menu a:hover { 
+                background-color: #adff2f; 
+                color: #000; 
+                border: 1px solid #adff2f; 
+            }
+
+            /* OKIENKA Z KATEGORIAMI */
+            .retro-window {
+                width: 750px; 
+                margin: 30px auto;
+                border: 3px outset #4a5c3f;
+                background-color: #2b3328;
+                box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.8);
+                text-align: left;
+            }
+            .window-title-nuclear {
+                background-color: #111a11;
+                padding: 5px 10px;
+                color: #adff2f;
+                font-size: 14px;
+                font-family: Tahoma, sans-serif;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid #4a5c3f;
+            }
+            .retro-window-content {
+                background-color: #080d08;
+                padding: 15px;
+                color: #7cfc00;
+                font-size: 13px;
+                border: 2px inset #4a5c3f;
+                margin: 5px;
+                line-height: 1.5;
+            }
+
+            /* BOXY NA POSZCZEGÓLNE MIEJSCA I LUDZI */
+            .miejsce-box {
+                border: 1px solid #2e4023;
+                padding: 15px;
+                margin-bottom: 20px;
+                background-color: rgba(20, 30, 20, 0.7);
+            }
+            .miejsce-tytul {
+                color: #ffcc00;
+                font-weight: bold;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-bottom: 1px dashed #556b2f;
+                display: inline-block;
+                padding-bottom: 2px;
+            }
+
+            /* GALERIA ZDJĘĆ */
+            .galeria-zdjec {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .galeria-zdjec img {
+                flex: 1 1 200px;
+                max-width: 100%;
+                height: 160px;
+                object-fit: cover;
+                border: 2px solid #4a5c3f;
+                box-shadow: 0px 0px 8px rgba(124, 252, 0, 0.2);
+                transition: transform 0.2s, border-color 0.2s;
+                cursor: pointer;
+            }
+
+            .galeria-zdjec img:hover {
+                transform: scale(1.03);
+                border-color: #adff2f;
+            }
+
+            /* STYL PRZYCISKÓW DO MAP */
+            .btn-mapa {
+                display: inline-block;
+                margin: 10px 0 20px 0;
+                padding: 8px 16px;
+                background-color: #000;
+                color: #ffcc00;
+                border: 1px solid #ffcc00;
+                font-family: "Courier New", monospace;
+                font-size: 12px;
+                font-weight: bold;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                box-shadow: 0px 0px 6px rgba(255, 204, 0, 0.3);
+                cursor: pointer;
+            }
+
+            .btn-mapa:hover {
+                background-color: #ffcc00;
+                color: #000;
+                box-shadow: 0px 0px 12px rgba(255, 204, 0, 0.8);
+            }
+
+            /* TAŚMA OSTRZEGAWCZA */
+            .warning-marquee {
+                background: #ffcc00;
+                color: #000;
+                font-weight: bold;
+                padding: 8px;
+                font-family: Tahoma, sans-serif;
+                font-size: 14px;
+                border: 2px solid #000;
+                outline: 3px dashed #ffcc00;
+                margin: 25px auto;
+                width: 750px;
+                text-align: center;
+                box-shadow: 0px 0px 15px rgba(255, 204, 0, 0.3);
+            }
+
+            /* STYLE POP-UP (MODAL) */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                z-index: 10000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-box {
+                background-color: #111a11;
+                border: 3px solid #adff2f;
+                box-shadow: 0px 0px 25px rgba(173, 255, 47, 0.4);
+                width: 80vw;
+                height: 85vh;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+            }
+
+            .modal-header {
+                background-color: #1a261a;
+                padding: 8px 15px;
+                color: #adff2f;
+                font-family: Tahoma, sans-serif;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #4a5c3f;
+            }
+
+            .modal-controls {
+                display: flex;
+                gap: 5px;
+            }
+
+            .modal-btn {
+                background: #000;
+                color: #adff2f;
+                border: 1px solid #4a5c3f;
+                padding: 2px 8px;
+                cursor: pointer;
+                font-family: monospace;
+                font-size: 12px;
+            }
+            .modal-btn:hover {
+                background: #adff2f;
+                color: #000;
+            }
+
+            .modal-close {
+                color: #ff4444;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-left: 10px;
+            }
+            .modal-close:hover { color: #ff0000; }
+
+            .modal-body {
+                flex: 1;
+                padding: 10px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                position: relative;
+            }
+
+            .img-container {
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: grab;
+            }
+            .img-container:active {
+                cursor: grabbing;
+            }
+
+            .modal-body img {
+                max-width: 100%;
+                max-height: 100%;
+                border: 1px solid #556b2f;
+                object-fit: contain;
+                transition: transform 0.1s ease-out;
+                transform-origin: center center;
+            }
+
+            .modal-caption {
+                padding: 8px 0;
+                color: #ffcc00;
+                font-family: "Courier New", monospace;
+                font-size: 13px;
+                text-align: center;
+                background-color: #080d08;
+                width: 100%;
+                border-top: 1px solid #2e4023;
+            }
+
+            /* MAPA LEAFLET I STYLE POPUPÓW MAPY */
+            #leaflet-map-container {
+                width: 100%;
+                height: 100%;
+                display: none;
+            }
+            
+            .leaflet-popup-content-wrapper {
+                background: #111a11 !important;
+                color: #adff2f !important;
+                border: 1px solid #4a5c3f;
+                font-family: "Courier New", monospace;
+                text-align: center;
+                padding: 5px;
+            }
+            .leaflet-popup-tip {
+                background: #111a11 !important;
+            }
+            .map-popup-img {
+                width: 140px;
+                height: 90px;
+                object-fit: cover;
+                margin-top: 5px;
+                border: 1px solid #4a5c3f;
+                cursor: pointer;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .map-popup-img:hover {
+                border-color: #adff2f;
+            }
+            .btn-streetview {
+                display: inline-block;
+                margin-top: 8px;
+                padding: 4px 8px;
+                background-color: #ffcc00;
+                color: #000;
+                font-weight: bold;
+                font-size: 10px;
+                text-decoration: none;
+                border: 1px solid #000;
+                border-radius: 3px;
+                transition: background-color 0.2s;
+            }
+            .btn-streetview:hover {
+                background-color: #adff2f;
+            }
+        </style>
+    </head>
+    <body>
+
+        <audio id="sound-click" src="click.mp3" preload="auto"></audio>
+
+        <!-- MENU GÓRNE -->
+        <nav class="gorne-menu">
+            <ul>
+                <li style="color: #ff4444; font-family: Tahoma; font-weight: bold; margin-right: 20px;">[ STREFA WYKLUCZENIA ]</li>
+                <li><a href="strona testpwa.html" onclick="odtwarzDzwiekKlikniecia()">&lt;&lt; BAZA (Główna)</a></li>
+                <li><a href="#elektrownia" onclick="odtwarzDzwiekKlikniecia()">Reaktor 4</a></li>
+                <li><a href="#prypec" onclick="odtwarzDzwiekKlikniecia()">Prypeć</a></li>
+                <li><a href="#duga" onclick="odtwarzDzwiekKlikniecia()">Oko Moskwy</a></li>
+                <li><a href="#maszyny" onclick="odtwarzDzwiekKlikniecia()">Złomowiska</a></li>
+                <li><a href="#ludzie" onclick="odtwarzDzwiekKlikniecia()" style="color: #ffcc00;">Ludzie Czarnobyla</a></li>
+            </ul>
+        </nav>
+
+        <div style="text-align: center; margin-top: 50px;">
+            <img src="chernobyl_logo.svg" alt="CHERNOBYL" style="max-width: 80%; filter: drop-shadow(0px 0px 12px rgba(173, 255, 47, 0.7));">
+        </div>
+
+        <div class="warning-marquee">
+            <marquee scrollamount="8">
+                ⚠️ UWAGA: PRZEKRACZASZ GRANICĘ STREFY WYKLUCZENIA ⚠️ POZIOM PROMIENIOWANIA WYNOSI 3.6 ROENTGENA - NIE JEST ŚWIETNIE, NIE JEST TRAGICZNIE ⚠️ UBIERZ SKAFANDER OCHRONNY ⚠️
+            </marquee>
+        </div>  
+
+        <!-- KATEGORIA 1: ELEKTROWNIA -->
+        <div class="retro-window" id="elektrownia">
+            <div class="window-title-nuclear">
+                <span>01_Elektrownia_Jadrowa_V.I.Lenina.exe</span>
+                <span style="cursor: pointer;">[_][X]</span>
+            </div>
+            <div class="retro-window-content">
+                
+                <div style="text-align: center;">
+                    <button class="btn-mapa" onclick="otworzMape(51.3892, 30.0994, 14)">
+                        ☢️ > OTWÓRZ_INTERAKTYWNĄ_MAPĘ_STREFY.sys
+                    </button>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Blok Energetyczny nr 4 (Reaktor)</div>
+                    <p>Epizentrum najgroźniejszej katastrofy w historii energetyki jądrowej. 26 kwietnia 1986 r. o godzinie 1:23:45, w wyniku nieudanego testu systemu bezpieczeństwa, w reaktorze RBMK-1000 nastąpił gwałtowny wzrost mocy, co doprowadziło do dwóch eksplozji pary i wodoru. Wybuch całkowicie zniszczył rdzeń, wyrywając 1000-tonową pokrywę (tzw. Helenę) i uwalniając do atmosfery ok. 5300 PBq substancji promieniotwórczych — ponad 400 razy więcej niż bomba zrzucona na Hiroszimę.</p>
+                    <div class="galeria-zdjec">
+                        <img src="reaktor4.jpeg" alt="Blok Energetyczny nr 4" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="reaktor4_2.jpeg" alt="Zniszczony Reaktor 1986" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Sterownia Reaktora nr 4 (Control Room)</div>
+                    <p>Mroczne serce katastrofy, z którego kierowano pracą IV bloku. To w tym pomieszczeniu zapadały krytyczne decyzje podejmowane pod naciskiem zastępcy naczelnego inżyniera Anatolija Diatłowa. O godzinie 1:23:40 operator Leonid Toptunow wcisnął przycisk awaryjny AZ-5 (prętów wygaszających), co z powodu wadliwej konstrukcji prętów z grafitowymi końcówkami wywołało efekt odwrotny i doprowadziło do natychmiastowej eksplozji. Dziś pomieszczanie jest całkowicie zdemontowane i skażone, a wstęp wymaga specjalnych kombinezonów.</p>
+                    <div class="galeria-zdjec">
+                        <img src="sterownia_1.jpg" alt="Sterownia dzisiaj" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="sterownia.jpeg" alt="Pulpit AZ-5" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+                
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Sarkofag i Arka (New Safe Confinement)</div>
+                    <p>Pierwszy betonowy „Sarkofag” zbudowano w ekstremalnych warunkach w zaledwie 206 dni od katastrofy, poświęcając zdrowie ponad 600 tysięcy tzw. likwidatorów. Ponieważ konstrukcja z czasem zaczęła pękać, w 2016 roku wzniesiono Nową Bezpieczną Powłokę (NSC). Jest to największa na świecie ruchoma konstrukcja lądowa — waży ponad 36 000 ton, ma 108 metrów wysokości i 257 metrów rozpiętości. Arka ma zabezpieczać reaktor przez najbliższe 100 lat i umożliwić zdalny demontaż zniszczonego rdzenia.</p>
+                    <div class="galeria-zdjec">
+                        <img src="Sarkofag_1.jpg" alt="Stary Sarkofag" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="Sarkofag.jpeg" alt="Nowa Arka NSC" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORIA 2: PRYPEĆ -->
+        <div class="retro-window" id="prypec">
+            <div class="window-title-nuclear">
+                <span>02_Miasto_Widmo_Prypec.doc</span>
+                <span style="cursor: pointer;">[_][X]</span>
+            </div>
+            <div class="retro-window-content">
+
+                <div style="text-align: center;">
+                    <button class="btn-mapa" onclick="otworzMape(51.4057, 30.0565, 15)">
+                        🗺️ > WCZYTAJ_INTERAKTYWNĄ_MAPĘ_PRYPECI.map
+                    </button>
+                </div>
+
+                <p style="color: #ccc; margin-bottom: 20px;">Wzorcowe radzieckie miasto socjalistyczne założone w 1970 roku dla pracowników elektrowni. W momencie ewakuacji (27 kwietnia 1986 r.) liczyło blisko 50 000 mieszkańców, których wywieziono w ciągu 3 godzin flotą 1200 autobusów. Dziś to miasto-widmo, powoli niszczone przez naturę.</p>
+                
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Pałac Kultury "Energetyk"</div>
+                    <p>Główny ośrodek życia społecznego Prypeci, mieszczący się przy placu Lenina. Wewnątrz znajdowały się sale koncertowe, kino, basen, sala gimnastyczna oraz studio nagrań. To tutaj odbywały się wiece i próby lokalnych zespołów. W pierwszych dniach po awarii budynek służył jako sztab kryzysowy oraz punkt dyslokacji dla sztabu wojskowego kierującego akcją ratunkową.</p>
+                    <div class="galeria-zdjec">
+                        <img src="palac_kultury.jpeg" alt="Pałac Kultury z zewnątrz" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="palac_kultury_2.webp" alt="Wnętrze Pałacu Kultury" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Hotel "Polesie" (Polissya)</div>
+                    <p>Wybudowany w połowie lat 70. najwyższy punkt widokowy w centrum Prypeci. Po ewakuacji mieszkańców na dachu hotelu stacjonowali wojskowi obserwatorzy i dozymetryści. Stąd kierowano operacją zasypywania płonącego rdzenia reaktora ołowiem, piaskiem i borem z helikopterów Mi-8, narażając pilotów na śmiertelne dawki promieniowania.</p>
+                    <div class="galeria-zdjec">
+                        <img src="hotel_polesie.jpg" alt="Hotel Polesie" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="hotel_polesie_2.webp" alt="Widok z dachu Hotelu Polesie" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Wesołe Miasteczko i Diabelski Młyn</div>
+                    <p>Park rozrywki miał zostać uroczyście otwarty podczas obchodów Święta Pracy — 1 maja 1986 roku. Żadne dziecko nigdy oficjalnie z niego nie skorzystało (uruchomiono go jedynie na parę godzin 27 kwietnia, by odwrócić uwagę mieszkańców przed ewakuacją). Żółty diabelski młyn mierzący 26 metrów wysokości oraz rdzewiejące samochodziki stanowią dziś najbardziej rozpoznawalny i przygnębiający symbol przerwanego życia w Zonie.</p>
+                    <div class="galeria-zdjec">
+                        <img src="diabelski_mlyn.jpg" alt="Diabelski Młyn" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="diabelski_mlyn_2.jpg" alt="Karuzela z autkami" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Szpital nr 126 i Piwnica Strażaków</div>
+                    <p>Miejskie centrum medyczne, do którego trafili pierwsi strażacy z jednostki SVPCh-6 pod dowództwem Wiktora Kibenoka i Władimira Prawika. Lekarze nie znali jeszcze skali skażenia — odzież strażaków zrzucono do szpitalnej piwnicy. Pomieszczenie to do dzisiaj pozostaje jednym z najniebezpieczniejszych miejsc na Ziemi: odzież emituje promieniowanie gamma na poziomie kilkunastu miliSiwertów na godzinę, co może wywołać chorobę popromienną w zaledwie kilkadziesiąt minut przebywania w jej pobliżu.</p>
+                    <div class="galeria-zdjec">
+                        <img src="szpital.jpg" alt="Szpital nr 126" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="szpital_2.jpg" alt="Łóżka szpitalne" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+                
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Basen "Lazurowy"</div>
+                    <p>Jeden z niewielu obiektów w Prypeci, który działał jeszcze długo po katastrofie. Został zdekontaminowany i służył likwidatorom oraz pracownikom nadzorującym elektrownię aż do 1998 roku (12 lat po wybuchu). Obecnie zrujnowana niecka basenu z charakterystyczną skocznią jest stałym punktem wycieczek oraz lokacją znaną z gier komputerowych, takich jak S.T.A.L.K.E.R. czy Call of Duty: Modern Warfare.</p>
+                    <div class="galeria-zdjec">
+                        <img src="basen_lazurowy.jpeg" alt="Basen Lazurowy" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="basen_lazurowy_2.webp" alt="Skocznia basenowa" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORIA 3: DUGA -->
+        <div class="retro-window" id="duga">
+            <div class="window-title-nuclear">
+                <span>03_Oko_Moskwy_DUGA.dat</span>
+                <span style="cursor: pointer;">[_][X]</span>
+            </div>
+            <div class="retro-window-content">
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Radar Pozahoryzontalny DUGA (Czarnobyl-2)</div>
+                    <p>Tajna radziecka instalacja wojskowa służąca do wykrywania ewentualnego startu amerykańskich pocisków balistycznych z głowicami nuklearnymi. Gigantyczny system antenowy ma 150 metrów wysokości, prawie 500 metrów długości i waży ponad 14 000 ton. Nadajnik wywoływał zakłócenia w cywilnym odbiorze fal krótkich na całym świecie, emitując charakterystyczny stukot o częstotliwości 10 Hz — stąd jego zachodni kryptonim "Russian Woodpecker" (Rosyjski Dzięcioł). Do utrzymania kompleksu zbudowano w lesie tajne minimiasteczko Czarnobyl-2.</p>
+                    <div class="galeria-zdjec">
+                        <img src="duga.webp" alt="Radar Duga z daleka" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="duga.jpg" alt="Radar Duga konstrukcja" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORIA 4: POJAZDY PRL W STREFIE -->
+        <div class="retro-window" id="maszyny">
+            <div class="window-title-nuclear" style="background-color: #330000; color: #ff4444; border-bottom: 1px solid #660000;">
+                <span>04_Cmentarzyska_Maszyn.exe [TOP SECRET]</span>
+                <span style="cursor: pointer;">[_][X]</span>
+            </div>
+            <div class="retro-window-content" style="border-color: #660000; background-color: #1a0505; color: #ff9999;">
+                <p>Podczas usuwania skutków awarii użyto tysięcy jednostek ciężkiego sprzętu. Pojazdy pracujące bezpośrednio przy gruzach reaktora wchłonęły śmiertelne dawki promieniowania i nigdy nie mogły opuścić strefy.</p>
+                
+                <div class="miejsce-box" style="border-color: #660000; background-color: rgba(40, 10, 10, 0.7);">
+                    <div class="miejsce-tytul" style="color: #ff4444; border-bottom-color: #ff4444;">Rasocha i Buriakówka (Złomowiska)</div>
+                    <p>Składowiska skażonego sprzętu wojskowego i cywilnego. Na cmentarzysku w Rasosze zgromadzono ponad 1600 pojazdów: wozy strażackie ZiŁ-130, opancerzone wozów rozpoznawcze BRDM-2, spychacze BAT-M oraz potężne helikoptery transportowe Mi-6 i Mi-26. Ze względu na nielegalny proceder pozyskiwania części przez złomiarzy, zepchnięto sprzęt do głębokich rowów i zasypano gruntu na cmentarzysku w Buriakówce, które do dziś jest oficjalnym punktem składowania odpadów promieniotwórczych.</p>
+                    
+                    <p style="font-size: 11px; color: #cc6666; margin-top: 10px;">* Sprzęt z Rasochy został całkowicie zutylizowany i zezłomowany po przetopieniu w specjalnych piecach.</p>
+                    
+                    <div class="galeria-zdjec">
+                        <img src="zlomowisko.jpeg" alt="Helikoptery na złomowisku" onclick="otworzOkno(this.src, this.alt)">
+                        <img src="zlomowisko_2.webp" alt="Pojazdy strażackie ZiŁ" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORIA 5: LUDZIE CZARNOBYLA -->
+        <div class="retro-window" id="ludzie">
+            <div class="window-title-nuclear" style="background-color: #1a2200; color: #ffcc00; border-bottom: 1px solid #556b2f;">
+                <span>05_Wazne_Postacie_Strefy.usr</span>
+                <span style="cursor: pointer;">[_][X]</span>
+            </div>
+            <div class="retro-window-content">
+                <p style="color: #ffcc00; margin-bottom: 15px;">Akta i biografie kluczowych postaci: inżynierów, naukowców, ratowników oraz likwidatorów, którzy odegrali bezpośrednią rolę w wydarzeniach z 1986 roku.</p>
+                
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Anatolij Diatłow</div>
+                    <p>Zastępca naczelnego inżyniera ds. eksploatacji Bloku Energetycznego nr 4. Nadzorował feralny test bezpieczeństwa w nocy 26 kwietnia. Skazany na 10 lat więzienia za nieprzestrzeganie zasad bezpieczeństwa (odbył 5 lat). Do końca życia utrzymywał, że główną przyczyną awarii były wady konstrukcyjne reaktora RBMK-1000.</p>
+                    <div class="galeria-zdjec">
+                        <img src="diatlow.jpg" alt="Anatolij Diatłow" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Walerij Legasow</div>
+                    <p>Zastępca dyrektora Instytutu Energii Atomowej im. Kurczatowa, główny naukowiec w komisji rządowej badającej przyczyny katastrofy. To on podjął kluczowe decyzje o zasypywaniu płonącego reaktora borem i ołowiem. Jego odważne wystąpienie w Wiedniu ujawniło część prawdy o tragedii, a spisane przez niego taśmy przyczyniły się do modernizacji reaktorów RBMK.</p>
+                    <div class="galeria-zdjec">
+                        <img src="legasow.jpg" alt="Walerij Legasow" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+
+                <div class="miejsce-box">
+                    <div class="miejsce-tytul">Trzej Nurkowie ("Drużyna Samobójców")</div>
+                    <p>Aleksiej Ananenko, Walerij Bezpałow i Borys Baraniw — inżynierowie i wojskowi, którzy zeszli do zalanych piwnic pod reaktorem, by ręcznie otworzyć zawory odpływowe zbiornika rozpyłowego. Ich heroiczny czyn zapobiegł kolejnej eksplozji parowej po przetopieniu się paliwa. Wbrew powszechnemu mitowi o ich natychmiastowej śmierci, przetrwali oni opromienienie i przeżyli długie lata po awarii.</p>
+                    <div class="galeria-zdjec">
+                        <img src="nurkowie.jpg" alt="Nurkowie z Czarnobyla" onclick="otworzOkno(this.src, this.alt)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stopka -->
+        <div style="text-align: center; margin: 40px 0 20px 0; font-family: Tahoma; font-size: 11px; color: #888; background-color: rgba(0,0,0,0.5); padding: 10px; border-top: 1px solid #333;">
+            [ Copyright &copy; 2026 Pchlasz ] - Wszelkie anomalie zgłaszać Sidorowiczowi.
+        </div>
+
+        <!-- POP-UP (MODAL) DO PODGLĄDU ZDJĘĆ I MAP -->
+        <div id="image-modal" class="modal-overlay" onclick="zamknijOkno()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <span id="modal-title">[ PODGLĄD SYSTEMOWY ]</span>
+                    <div class="modal-controls">
+                        <button class="modal-btn" id="btn-zoom-in" onclick="zmienZoom(0.25)">[ + ]</button>
+                        <button class="modal-btn" id="btn-zoom-out" onclick="zmienZoom(-0.25)">[ - ]</button>
+                        <button class="modal-btn" id="btn-zoom-reset" onclick="resetZoom()">[ 100% ]</button>
+                        <span class="modal-close" onclick="zamknijOkno()">[ X ]</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="img-container" id="img-container">
+                        <img id="modal-img" src="" alt="">
+                    </div>
+                    <div id="leaflet-map-container"></div>
+                </div>
+                <div id="modal-caption" class="modal-caption"></div>
+            </div>
+        </div>
+
+        <!-- SKRYPT LEAFLET.JS DO ZARZĄDZANIA MAPĄ GOOGLE SATELLITE -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            let currentScale = 1;
+            let isDragging = false;
+            let startX, startY, translateX = 0, translateY = 0;
+            let leafletMap = null;
+
+            function odtwarzDzwiekKlikniecia() {
+                var snd = document.getElementById("sound-click");
+                if (snd) { snd.currentTime = 0; snd.play().catch(e => {}); }
+            }
+
+            // OTWIERANIE PODGLĄDU ZDJĘCIA
+            function otworzOkno(sciezkaZdjecia, opis) {
+                odtwarzDzwiekKlikniecia();
+                resetZoom();
+                
+                document.getElementById('leaflet-map-container').style.display = 'none';
+                document.getElementById('img-container').style.display = 'flex';
+                document.querySelector('.modal-controls').style.display = 'flex';
+                
+                const img = document.getElementById('modal-img');
+                img.src = sciezkaZdjecia;
+                document.getElementById('modal-caption').innerText = opis || "";
+                document.getElementById('image-modal').style.display = 'flex';
+            }
+
+            // OTWIERANIE INTERAKTYWNEJ MAPY GOOGLE
+            function otworzMape(lat, lng, zoom) {
+                odtwarzDzwiekKlikniecia();
+                
+                document.getElementById('img-container').style.display = 'none';
+                document.querySelector('.modal-controls').style.display = 'none';
+                const mapDiv = document.getElementById('leaflet-map-container');
+                mapDiv.style.display = 'block';
+                
+                document.getElementById('modal-caption').innerText = "Kliknij zdjęcie na mapie, aby je powiększyć, lub przycisk Street View dla widoku 360°.";
+                document.getElementById('image-modal').style.display = 'flex';
+
+                if (!leafletMap) {
+                    leafletMap = L.map('leaflet-map-container').setView([lat, lng], zoom);
+                    
+                    // GOOGLE MAPS SATELLITE/HYBRID LAYER
+                    L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+                        maxZoom: 20,
+                        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                        attribution: '© Google Maps'
+                    }).addTo(leafletMap);
+
+                    function stworzPopup(tytul, zdjecie, lat, lng) {
+                        const streetViewUrl = `https://www.google.com/maps?q=&layer=c&cbll=${lat},${lng}`;
+                        return `
+                            <b>${tytul}</b><br>
+                            <img src="${zdjecie}" class="map-popup-img" onclick="otworzOkno('${zdjecie}', '${tytul}')">
+                            <a href="${streetViewUrl}" target="_blank" class="btn-streetview">🌐 Zobacz w Street View 360°</a>
+                        `;
+                    }
+
+                   // --- KOREKTA POD PIKSELE Z MAPY GOOGLE ---
+
+                    // Diabelski Młyn (Pripyat Ferris Wheel) - authoritative coordinates
+                    L.marker([51.4081333, 30.0571250]).addTo(leafletMap).bindPopup(
+                        stworzPopup('Diabelski Młyn', 'diabelski_mlyn.jpg', 51.4081333, 30.0571250)
+                    );
+
+                    // Pałac Kultury "Energetyk" - coordinates from Wikipedia geohack
+                    L.marker([51.4067500, 30.0566667]).addTo(leafletMap).bindPopup(
+                        stworzPopup('Pałac Kultury Energetyk', 'palac_kultury.jpeg', 51.4067500, 30.0566667)
+                    );
+
+                    // Hotel Polesie (Polissya) - coordinates from Wikipedia
+                    L.marker([51.4071500, 30.0582300]).addTo(leafletMap).bindPopup(
+                        stworzPopup('Hotel Polesie', 'hotel_polesie.jpg', 51.4071500, 30.0582300)
+                    );
+
+                    // Basen Lazurowy (Azure Swimming Pool) - corrected to authoritative coords
+                    L.marker([51.4071500, 30.0582300]).addTo(leafletMap).bindPopup(
+                        stworzPopup('Basen Lazurowy', 'basen_lazurowy.jpeg', 51.4071500, 30.0582300)
+                    );
+
+                    // Szpital nr 126 - centroid of OpenStreetMap way nodes (OSM way 279247064)
+                    L.marker([51.4069451, 30.0706397]).addTo(leafletMap).bindPopup(
+                        stworzPopup('Szpital nr 126', 'szpital.jpg', 51.4069451, 30.0706397)
+                    );
+
+                } else {
+                    leafletMap.setView([lat, lng], zoom);
+                }
+                
+                setTimeout(() => { leafletMap.invalidateSize(); }, 200);
+            }
+
+            function zamknijOkno() {
+                odtwarzDzwiekKlikniecia();
+                document.getElementById('image-modal').style.display = 'none';
+            }
+
+            // LOGIKA PRZYBLIŻANIA I PRZESUWANIA ZDJĘĆ
+            function aktualizujTransformacje() {
+                const img = document.getElementById('modal-img');
+                img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+            }
+
+            function zmienZoom(delta) {
+                currentScale = Math.min(Math.max(0.5, currentScale + delta), 4);
+                if (currentScale === 1) { translateX = 0; translateY = 0; }
+                aktualizujTransformacje();
+            }
+
+            function resetZoom() {
+                currentScale = 1;
+                translateX = 0;
+                translateY = 0;
+                aktualizujTransformacje();
+            }
+
+            // OBSŁUGA ROLKI MYSZY DO ZOOMOWANIA ZDJĘĆ
+            document.getElementById('img-container').addEventListener('wheel', function(e) {
+                e.preventDefault();
+                if (e.deltaY < 0) {
+                    zmienZoom(0.15);
+                } else {
+                    zmienZoom(-0.15);
+                }
+            });
+
+            // OBSŁUGA DRAG & DROP DLA PRZYBLIŻONEGO ZDJĘCIA
+            const container = document.getElementById('img-container');
+            container.addEventListener('mousedown', (e) => {
+                if (currentScale > 1) {
+                    isDragging = true;
+                    startX = e.clientX - translateX;
+                    startY = e.clientY - translateY;
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    translateX = e.clientX - startX;
+                    translateY = e.clientY - startY;
+                    aktualizujTransformacje();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        </script>
+    </body>
+</html>
